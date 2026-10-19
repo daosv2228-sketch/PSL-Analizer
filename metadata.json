@@ -1,0 +1,6 @@
+{
+  "name": "PSL Face Analyzer",
+  "description": "Математический анализатор привлекательности лица по методологии PSL с real-time коучем позиционирования и Face Mesh landmarks.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
