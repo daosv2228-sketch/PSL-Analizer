@@ -81,20 +81,14 @@ jobs:
         continue-on-error: true
         run: |
           echo "Sending APK to Telegram..."
-          CAPTION="🚀 *PSL Face Analyzer — Свежая сборка APK!*
-          
-📱 *Файл:* \`PSL_Analyzer_Debug.apk\`
-📦 *Размер:* ${{ steps.apk_info.outputs.apk_size }}
-⏱ *Собрано:* ${{ env.BUILD_TIME }}
-💬 *Коммит:* \`${{ github.event.head_commit.message || 'Ручной запуск' }}\`
-🔗 *Ветка:* \`${{ github.ref_name }}\`
-
-👉 Нажмите на файл в Telegram, чтобы установить приложение на смартфон."
+          CAPTION="🚀 PSL Face Analyzer — Свежая сборка APK!
+          📦 Размер: ${{ steps.apk_info.outputs.apk_size }}
+          ⏱ Собрано: ${{ env.BUILD_TIME }}
+          👉 Нажмите на файл в Telegram, чтобы установить приложение на смартфон."
 
           curl -s -F "chat_id=${{ env.TELEGRAM_CHAT_ID }}" \
                -F "document=@${{ steps.apk_info.outputs.apk_path }};filename=PSL_Analyzer_Debug.apk" \
                -F "caption=$CAPTION" \
-               -F "parse_mode=Markdown" \
                "https://api.telegram.org/bot${{ env.TELEGRAM_BOT_TOKEN }}/sendDocument" || echo "Telegram notification skipped or failed"
 
       - name: Add Step Summary
@@ -105,5 +99,5 @@ jobs:
           echo "- **Файл доступен:** во вкладке **Artifacts** этого запуска workflow." >> $GITHUB_STEP_SUMMARY
           if [ -z "${{ env.TELEGRAM_BOT_TOKEN }}" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "💡 *Подсказка:* Чтобы получать APK прямо в Telegram на телефон, добавьте секреты \`TELEGRAM_BOT_TOKEN\` и \`TELEGRAM_CHAT_ID\` в настройках репозитория (Settings -> Secrets -> Actions)." >> $GITHUB_STEP_SUMMARY
+            echo "💡 *Подсказка:* Чтобы получать APK прямо в Telegram на телефон, добавьте секреты TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID в настройках репозитория." >> $GITHUB_STEP_SUMMARY
           fi
