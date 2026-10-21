@@ -24,13 +24,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | sdkmanager --licenses || true
-
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -80,16 +73,18 @@ jobs:
         if: env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != ''
         continue-on-error: true
         run: |
-          echo "Sending APK to Telegram..."
+          echo "Sending APK to Telegram chat: ${{ env.TELEGRAM_CHAT_ID }}..."
           CAPTION="🚀 PSL Face Analyzer — Свежая сборка APK!
           📦 Размер: ${{ steps.apk_info.outputs.apk_size }}
           ⏱ Собрано: ${{ env.BUILD_TIME }}
           👉 Нажмите на файл в Telegram, чтобы установить приложение на смартфон."
 
-          curl -s -F "chat_id=${{ env.TELEGRAM_CHAT_ID }}" \
+          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot${{ env.TELEGRAM_BOT_TOKEN }}/sendDocument" \
+               -F "chat_id=${{ env.TELEGRAM_CHAT_ID }}" \
                -F "document=@${{ steps.apk_info.outputs.apk_path }};filename=PSL_Analyzer_Debug.apk" \
-               -F "caption=$CAPTION" \
-               "https://api.telegram.org/bot${{ env.TELEGRAM_BOT_TOKEN }}/sendDocument" || echo "Telegram notification skipped or failed"
+               -F "caption=$CAPTION")
+          
+          echo "Telegram Response: $RESPONSE"
 
       - name: Add Step Summary
         run: |
@@ -97,7 +92,3 @@ jobs:
           echo "- **Размер:** ${{ steps.apk_info.outputs.apk_size }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Время сборки:** ${{ env.BUILD_TIME }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Файл доступен:** во вкладке **Artifacts** этого запуска workflow." >> $GITHUB_STEP_SUMMARY
-          if [ -z "${{ env.TELEGRAM_BOT_TOKEN }}" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "💡 *Подсказка:* Чтобы получать APK прямо в Telegram на телефон, добавьте секреты TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID в настройках репозитория." >> $GITHUB_STEP_SUMMARY
-          fi
