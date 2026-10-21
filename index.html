@@ -166,6 +166,24 @@
             </div>
           </div>
 
+          <!-- Journal & Progress Button -->
+          <button id="btnOpenJournal" class="px-2.5 py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold" title="Журнал замеров и динамика">
+            <span>📈</span>
+            <span class="hidden md:inline" id="txtBtnJournal">Прогресс</span>
+          </button>
+
+          <!-- PRO Membership Button -->
+          <button id="btnOpenPaywall" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer" title="PRO Подписка">
+            <span>⭐</span>
+            <span id="txtBtnPro">PRO</span>
+          </button>
+
+          <!-- APK on Phone Testing Button -->
+          <button id="btnOpenApkModal" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer" title="Отправить .APK на телефон / Тестирование">
+            <span>📱</span>
+            <span class="hidden sm:inline" id="txtBtnApk">APK на телефон</span>
+          </button>
+
           <!-- Theme Toggle Button (Light / Dark) -->
           <button id="themeToggleBtn" class="px-2.5 py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium" title="Switch Theme">
             <span id="themeIconSun" class="hidden">☀️</span>
@@ -540,6 +558,9 @@
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               <span id="txtBtnExportPdf">Экспорт в PDF</span>
             </button>
+            <button id="btnSaveToJournal" class="px-3 py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Сохранить в журнал">
+              <span>💾</span> <span id="txtBtnSaveJournal">В журнал</span>
+            </button>
             <button id="btnRetakeAnalysis" class="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-xs cursor-pointer">
               <span id="txtBtnNewAnalysis">New Snapshot</span>
             </button>
@@ -821,7 +842,242 @@
       </div>
     </div>
 
-        <!-- Modal: Choose Looksmaxing Model for PDF Export -->
+        <!-- Modal: APK on Phone Testing & Distribution -->
+    <div id="modalApkPhoneTransfer" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-2xl w-full p-6 sm:p-7 max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col gap-4">
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-[#D1DEEE] dark:border-[#202C45]">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl font-bold">
+              📱
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-[#0F172A] dark:text-[#E6EDF7]">
+                Тестирование на телефоне / Получить .APK
+              </h3>
+              <p class="text-xs text-[#52627A] dark:text-[#8E9EB5]">
+                Сборка, мгновенная отправка в Telegram и проверка нововведений на смартфоне
+              </p>
+            </div>
+          </div>
+          <button id="btnCloseApkModal" class="p-2 text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] rounded-xl hover:bg-[#F3F7FC] dark:hover:bg-[#172033] transition-colors cursor-pointer text-lg font-bold">
+            ✕
+          </button>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold overflow-x-auto">
+          <button id="tabBtnApkTelegram" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl transition-all cursor-pointer bg-[#2563EB] text-white shadow-xs flex items-center justify-center gap-1.5">
+            <span>✈️</span>
+            <span>В Telegram</span>
+          </button>
+          <button id="tabBtnApkGithub" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl transition-all cursor-pointer text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] flex items-center justify-center gap-1.5">
+            <span>⚙️</span>
+            <span>GitHub CI/CD</span>
+          </button>
+          <button id="tabBtnApkQr" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl transition-all cursor-pointer text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] flex items-center justify-center gap-1.5">
+            <span>📷</span>
+            <span>QR Live Test</span>
+          </button>
+          <button id="tabBtnApkAdb" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl transition-all cursor-pointer text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] flex items-center justify-center gap-1.5">
+            <span>💻</span>
+            <span>ADB / Скрипты</span>
+          </button>
+        </div>
+
+        <!-- Tab 1: Telegram Direct Send -->
+        <div id="tabContentApkTelegram" class="flex flex-col gap-4">
+          <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 leading-relaxed flex items-start gap-2.5">
+            <span class="text-base">💡</span>
+            <div>
+              <strong>Самый быстрый способ тестировать на реальном Android:</strong> укажите токен Telegram-бота и ваш Chat ID. Файл APK прилетит прямо в ваш чат в Telegram на телефоне. Просто нажмите на полученный файл — и приложение обновится!
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <label for="apkTelegramBotToken" class="block font-semibold mb-1 text-[#0F172A] dark:text-[#E6EDF7]">
+                Telegram Bot Token:
+              </label>
+              <input type="text" id="apkTelegramBotToken" placeholder="например: 7123456789:AAHkQWERTYu..." class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#0B0F1A] border border-[#D1DEEE] dark:border-[#202C45] text-[#0F172A] dark:text-[#E6EDF7] focus:outline-hidden focus:border-[#2563EB] font-mono text-xs" />
+            </div>
+
+            <div>
+              <label for="apkTelegramChatId" class="block font-semibold mb-1 text-[#0F172A] dark:text-[#E6EDF7]">
+                Ваш Telegram Chat ID:
+              </label>
+              <input type="text" id="apkTelegramChatId" placeholder="например: 123456789 (ваш личный ID)" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#0B0F1A] border border-[#D1DEEE] dark:border-[#202C45] text-[#0F172A] dark:text-[#E6EDF7] focus:outline-hidden focus:border-[#2563EB] font-mono text-xs" />
+            </div>
+
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="chkRememberTelegramCreds" class="rounded border-[#D1DEEE] dark:border-[#202C45] text-[#2563EB]" checked />
+              <label for="chkRememberTelegramCreds" class="text-xs text-[#52627A] dark:text-[#8E9EB5] cursor-pointer">
+                Запомнить данные в этом браузере
+              </label>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 pt-2">
+            <button id="btnTestTelegram" class="px-4 py-2.5 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-all cursor-pointer flex items-center gap-2">
+              <span>💬</span>
+              <span>Проверить связь с ботом</span>
+            </button>
+            <button id="btnSendApkTelegram" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-2">
+              <span>🚀</span>
+              <span>Отправить .APK на телефон</span>
+            </button>
+          </div>
+
+          <!-- Live Status Console -->
+          <div id="apkTelegramStatus" class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#0B0F1A] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-mono text-[#52627A] dark:text-[#8E9EB5] min-h-[44px] flex items-center">
+            Готов к отправке на телефон.
+          </div>
+
+          <!-- Quick instructions accordion -->
+          <details class="text-xs bg-[#F3F7FC] dark:bg-[#172033] p-3 rounded-xl border border-[#D1DEEE] dark:border-[#202C45]">
+            <summary class="font-semibold cursor-pointer text-[#2563EB] flex items-center gap-1.5">
+              <span>❓</span>
+              <span>Как за 1 минуту создать своего бота для отправки APK?</span>
+            </summary>
+            <div class="mt-2.5 space-y-1.5 text-[#52627A] dark:text-[#8E9EB5] pl-2 border-l-2 border-[#2563EB]/40">
+              <p>1. Откройте в Telegram официального бота <strong class="text-[#0F172A] dark:text-[#E6EDF7]">@BotFather</strong> и отправьте команду <code class="bg-[#D1DEEE]/40 dark:bg-[#202C45] px-1 py-0.5 rounded">/newbot</code>.</p>
+              <p>2. Задайте имя (например: <em>MyTestApkBot</em>) и скопируйте выданный <strong class="text-[#0F172A] dark:text-[#E6EDF7]">HTTP API Token</strong>.</p>
+              <p>3. Нажмите <strong class="text-[#0F172A] dark:text-[#E6EDF7]">/start</strong> в созданном вами боте, чтобы разрешить ему присылать вам сообщения.</p>
+              <p>4. Чтобы узнать свой Chat ID, перейдите в бота <strong class="text-[#0F172A] dark:text-[#E6EDF7]">@userinfobot</strong> — он мгновенно покажет ваш числовой ID.</p>
+            </div>
+          </details>
+        </div>
+
+        <!-- Tab 2: GitHub Actions CI/CD -->
+        <div id="tabContentApkGithub" class="flex flex-col gap-4 hidden">
+          <div class="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-700 dark:text-purple-300 leading-relaxed flex items-start gap-2.5">
+            <span class="text-base">⚡</span>
+            <div>
+              <strong>Полная автоматизация через закрытый GitHub репозиторий:</strong> Мы создали для вас файл <code class="bg-purple-500/20 px-1 py-0.5 rounded font-mono">.github/workflows/build-and-send-apk.yml</code>. Теперь при каждом коммите GitHub бесплатно собирает APK и присылает его вам на телефон!
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs text-[#0F172A] dark:text-[#E6EDF7]">
+            <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="font-bold mb-1 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-[11px]">1</span>
+                <span>Добавьте секреты в репозитории на GitHub:</span>
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5] mb-2 pl-7">
+                Откройте ваш репозиторий -> <strong>Settings</strong> -> <strong>Secrets and variables</strong> -> <strong>Actions</strong> -> кнопка <strong>New repository secret</strong>:
+              </p>
+              <ul class="list-disc pl-11 space-y-1 font-mono text-[11px] text-[#2563EB]">
+                <li>TELEGRAM_BOT_TOKEN — токен от @BotFather</li>
+                <li>TELEGRAM_CHAT_ID — ваш числовой ID</li>
+              </ul>
+            </div>
+
+            <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="font-bold mb-1 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-[11px]">2</span>
+                <span>Сделайте коммит в репозиторий:</span>
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5] pl-7">
+                Достаточно сделать <code class="bg-[#D1DEEE]/40 dark:bg-[#202C45] px-1 py-0.5 rounded font-mono">git push</code>. GitHub Actions сам запустит виртуальную машину с Java 17, скомпилирует Android APK и через 2 минуты пришлет файл вам в Telegram!
+              </p>
+            </div>
+
+            <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="font-bold mb-1 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-[11px]">3</span>
+                <span>Скачивание из вкладки Actions:</span>
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5] pl-7">
+                Даже без Telegram, файл всегда доступен в GitHub: вкладка <strong>Actions</strong> -> кликните на последний запуск -> блок <strong>Artifacts</strong> -> <strong class="font-mono text-[#2563EB]">psl-analyzer-debug-apk</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Dynamic QR Code Live Test -->
+        <div id="tabContentApkQr" class="flex flex-col gap-4 hidden">
+          <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-700 dark:text-emerald-300 leading-relaxed flex items-start gap-2.5">
+            <span class="text-base">📲</span>
+            <div>
+              <strong>Мгновенное тестирование на смартфоне прямо сейчас:</strong> Не хотите ждать сборки APK? Откройте приложение на телефоне через камеру по QR-коду — камера 720p 30 FPS, 11 условий коуча и MediaPipe FaceMesh работают на 100% идентично!
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-6 p-4 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+            <div class="bg-white p-3 rounded-2xl shadow-md border border-[#D1DEEE] flex items-center justify-center">
+              <img id="imgApkLiveQr" src="" alt="QR Code" class="w-44 h-44 object-contain" />
+            </div>
+            <div class="flex flex-col gap-2.5 text-xs text-center sm:text-left max-w-xs">
+              <div class="font-bold text-[#0F172A] dark:text-[#E6EDF7] text-sm">
+                Наведите камеру смартфона
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5]">
+                Откройте ссылку в браузере <strong>Google Chrome Android</strong> для полного аппаратного ускорения камеры.
+              </p>
+              <div class="p-2.5 rounded-xl bg-white dark:bg-[#0B0F1A] border border-[#D1DEEE] dark:border-[#202C45] text-[11px] font-mono break-all text-[#2563EB]" id="txtApkLiveUrl">
+                --
+              </div>
+              <button id="btnCopyLiveUrl" class="px-3 py-1.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold transition-all cursor-pointer">
+                📋 Скопировать ссылку
+              </button>
+            </div>
+          </div>
+
+          <div class="text-xs text-[#52627A] dark:text-[#8E9EB5] bg-white dark:bg-[#0B0F1A] p-3 rounded-xl border border-[#D1DEEE] dark:border-[#202C45]">
+            ⭐ <strong>Лайфхак для установки как нативное приложение:</strong> открыв ссылку на телефоне в Google Chrome, нажмите меню ⋮ -> <em>«Установить приложение»</em> (или <em>«Добавить на главный экран»</em>). Приложение установится на домашний экран с иконкой и будет работать во весь экран без адресной строки!
+          </div>
+        </div>
+
+        <!-- Tab 4: ADB & Local Scripts -->
+        <div id="tabContentApkAdb" class="flex flex-col gap-4 hidden">
+          <div class="text-xs text-[#0F172A] dark:text-[#E6EDF7] space-y-3">
+            <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="font-bold mb-1">Сборка APK на вашем компьютере:</div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-black/80 text-emerald-400 font-mono text-xs">
+                <code>npm run build:apk</code>
+                <button class="text-white hover:text-emerald-300 cursor-pointer text-xs" onclick="navigator.clipboard.writeText('npm run build:apk')">📋</button>
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5] text-[11px] mt-1">
+                Собирает Vite проект, синхронизирует Capacitor и компилирует Debug APK через Gradle.
+              </p>
+            </div>
+
+            <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="font-bold mb-1">Установка на телефон через USB кабель (ADB):</div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-black/80 text-emerald-400 font-mono text-xs">
+                <code>adb install -r android/app/build/outputs/apk/debug/app-debug.apk</code>
+                <button class="text-white hover:text-emerald-300 cursor-pointer text-xs" onclick="navigator.clipboard.writeText('adb install -r android/app/build/outputs/apk/debug/app-debug.apk')">📋</button>
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5] text-[11px] mt-1">
+                Подключите телефон по проводу с включенной в настройках разработчика "Отладкой по USB".
+              </p>
+            </div>
+
+            <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="font-bold mb-1">Раздача APK по локальному Wi-Fi:</div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-black/80 text-emerald-400 font-mono text-xs">
+                <code>npm run serve:apk</code>
+                <button class="text-white hover:text-emerald-300 cursor-pointer text-xs" onclick="navigator.clipboard.writeText('npm run serve:apk')">📋</button>
+              </div>
+              <p class="text-[#52627A] dark:text-[#8E9EB5] text-[11px] mt-1">
+                Запускает локальный сервер на порту 3030 и выводит QR-код в консоль для прямого скачивания APK на смартфон.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end pt-3 border-t border-[#D1DEEE] dark:border-[#202C45]">
+          <button id="btnCancelApkModal" class="px-5 py-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] hover:bg-[#E2E8F0] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] text-xs font-semibold transition-all cursor-pointer">
+            Закрыть
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal: Choose Looksmaxing Model for PDF Export -->
     <div id="modalPdfExport" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
       <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-xl w-full p-6 sm:p-7 max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col gap-4">
         
@@ -910,6 +1166,233 @@
           </button>
         </div>
 
+      </div>
+    </div>
+
+
+    
+    <!-- Modal: Onboarding & Mandatory Medical Disclaimer (Google Play Compliance) -->
+    <div id="modalOnboardingDisclaimer" class="fixed inset-0 z-50 bg-[#0B0F1A]/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center gap-3 pb-3 border-b border-[#D1DEEE] dark:border-[#202C45]">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl font-bold shadow-md">
+            🔬
+          </div>
+          <div>
+            <h3 class="font-extrabold text-lg text-[#0F172A] dark:text-[#E6EDF7] tracking-tight">
+              PSL Face Analyzer
+            </h3>
+            <p class="text-xs text-[#52627A] dark:text-[#8E9EB5]">
+              Биометрический анализ пропорций лица и коуч софтмаксинга
+            </p>
+          </div>
+        </div>
+
+        <!-- Highlights List -->
+        <div class="space-y-2.5 text-xs">
+          <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033]">
+            <span class="text-base text-blue-600">🎯</span>
+            <span class="text-[#0F172A] dark:text-[#E6EDF7]"><strong>Real-time 11 критериев:</strong> Контроль идеальной фронтальной позы (0° Frontal) перед снимком на 720p.</span>
+          </div>
+          <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033]">
+            <span class="text-base text-indigo-600">⚖️</span>
+            <span class="text-[#0F172A] dark:text-[#E6EDF7]"><strong>Две мировые модели:</strong> Европейская (Western PSL) и Азиатская (K-Aesthetics V-Line) под разные стандарты.</span>
+          </div>
+          <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033]">
+            <span class="text-base text-emerald-600">🔒</span>
+            <span class="text-[#0F172A] dark:text-[#E6EDF7]"><strong>100% приватность:</strong> Обработка фото производится строго на вашем устройстве, без облачных серверов.</span>
+          </div>
+        </div>
+
+        <!-- Mandatory Google Play Non-Medical Disclaimer Box -->
+        <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col gap-2.5">
+          <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-xs uppercase tracking-wider">
+            <span>⚠️</span>
+            <span>Дисклеймер о ненаправленности на медицину</span>
+          </div>
+          <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5] leading-relaxed">
+            Приложение носит исключительно информационно-развлекательный и эстетический характер. Оно <strong>НЕ является медицинским инструментом</strong>, системой клинической диагностики или средством назначения лечения.
+          </p>
+          <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-amber-500/20">
+            <input type="checkbox" id="chkMedicalDisclaimerConsent" class="mt-0.5 w-4 h-4 text-[#2563EB] accent-[#2563EB] rounded cursor-pointer shrink-0" />
+            <span class="text-[11px] text-[#0F172A] dark:text-[#E6EDF7] font-semibold leading-snug">
+              Я подтверждаю, что ознакомлен(а) с дисклеймером и понимаю, что приложение не является медицинским инструментом.
+            </span>
+          </label>
+        </div>
+
+        <!-- Confirm CTA -->
+        <button id="btnConfirmOnboarding" disabled class="w-full py-3 rounded-xl font-bold text-xs bg-[#2563EB] text-white opacity-40 cursor-not-allowed transition-all shadow-md">
+          Начать использование
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: PRO Looksmaxing Club (Paywall - Monthly, Annual & Lifetime) -->
+    <div id="modalPaywall" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto relative">
+        <button id="btnClosePaywallModal" class="absolute top-4 right-4 p-1.5 rounded-xl text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer" title="Закрыть">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <!-- Header -->
+        <div class="flex flex-col items-center text-center pt-2">
+          <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-2">
+            ⭐ PRO LOOKSMAXING CLUB
+          </span>
+          <h3 class="font-black text-xl text-[#0F172A] dark:text-[#E6EDF7] tracking-tight">
+            Разблокируйте полный потенциал
+          </h3>
+          <p class="text-xs text-[#52627A] dark:text-[#8E9EB5] mt-1 max-w-sm">
+            Неограниченные PDF-отчёты с разметкой, углублённые протоколы и журнал динамики
+          </p>
+        </div>
+
+        <!-- Features Included -->
+        <div class="grid grid-cols-2 gap-2 text-[11px] font-semibold text-[#0F172A] dark:text-[#E6EDF7] p-3 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-500 font-bold">✓</span>
+            <span>Экспорт PDF с разметкой</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-500 font-bold">✓</span>
+            <span>Все 11 метрик лица</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-500 font-bold">✓</span>
+            <span>Гайды по софтмаксингу</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-500 font-bold">✓</span>
+            <span>Журнал прогресса во времени</span>
+          </div>
+        </div>
+
+        <!-- 3 Tariff Plans (No weekly plan to avoid churn!) -->
+        <div class="space-y-2.5">
+          <!-- Annual Plan (Best Value) -->
+          <label id="planCardAnnual" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#2563EB] bg-blue-50/50 dark:bg-blue-950/20 cursor-pointer transition-all">
+            <div class="flex items-center gap-3">
+              <input type="radio" name="paywallPlanRadio" value="annual" checked class="w-4 h-4 text-[#2563EB] accent-[#2563EB]" />
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Годовой план</span>
+                  <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-red-600 text-white">ХИТ • СКИДКА 50%</span>
+                </div>
+                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">$2.50 в месяц ($29.99 / год)</p>
+              </div>
+            </div>
+            <span class="font-mono font-black text-sm text-[#0F172A] dark:text-[#E6EDF7]">$29.99</span>
+          </label>
+
+          <!-- Monthly Plan (with 3-day trial) -->
+          <label id="planCardMonthly" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-blue-400 bg-white dark:bg-[#172033] cursor-pointer transition-all">
+            <div class="flex items-center gap-3">
+              <input type="radio" name="paywallPlanRadio" value="monthly" class="w-4 h-4 text-[#2563EB] accent-[#2563EB]" />
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Месячный план</span>
+                  <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-emerald-600 text-white">3 ДНЯ ТРИАЛ</span>
+                </div>
+                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">3 дня бесплатно, затем $4.99 / месяц</p>
+              </div>
+            </div>
+            <span class="font-mono font-black text-sm text-[#0F172A] dark:text-[#E6EDF7]">$4.99</span>
+          </label>
+
+          <!-- Lifetime Pass -->
+          <label id="planCardLifetime" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-purple-400 bg-white dark:bg-[#172033] cursor-pointer transition-all">
+            <div class="flex items-center gap-3">
+              <input type="radio" name="paywallPlanRadio" value="lifetime" class="w-4 h-4 text-purple-600 accent-purple-600" />
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Навсегда (Lifetime)</span>
+                  <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-purple-600 text-white">РАЗОВЫЙ ПЛАТЁЖ</span>
+                </div>
+                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Полный доступ без подписок</p>
+              </div>
+            </div>
+            <span class="font-mono font-black text-sm text-[#0F172A] dark:text-[#E6EDF7]">$49.99</span>
+          </label>
+        </div>
+
+        <!-- Action Button -->
+        <button id="btnSubscribePro" class="w-full py-3.5 rounded-2xl font-bold text-sm bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white transition-all shadow-md cursor-pointer flex items-center justify-center gap-2">
+          <span id="txtBtnSubscribeLabel">Активировать PRO доступ</span>
+        </button>
+
+        <!-- Google Play Footer with Restore Purchases -->
+        <div class="flex items-center justify-between text-[11px] text-[#52627A] dark:text-[#8E9EB5] pt-1 border-t border-[#D1DEEE] dark:border-[#202C45]">
+          <button id="btnRestorePurchases" class="hover:underline font-semibold cursor-pointer">
+            Восстановить покупки
+          </button>
+          <span>Google Play Subscriptions</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: History Progress Journal (IndexedDB Storage & Chart) -->
+    <div id="modalHistoryJournal" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto relative">
+        <button id="btnCloseJournalModal" class="absolute top-4 right-4 p-1.5 rounded-xl text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer" title="Закрыть">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <!-- Header -->
+        <div class="flex items-center gap-3 pb-3 border-b border-[#D1DEEE] dark:border-[#202C45]">
+          <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl font-bold">
+            📈
+          </div>
+          <div>
+            <h3 class="font-extrabold text-lg text-[#0F172A] dark:text-[#E6EDF7] tracking-tight">
+              Журнал прогресса и замеров
+            </h3>
+            <p class="text-xs text-[#52627A] dark:text-[#8E9EB5]">
+              Локальная база данных (IndexedDB): отслеживание изменений пропорций во времени
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Всего замеров</span>
+            <span id="journalStatTotal" class="font-mono font-bold text-base text-[#0F172A] dark:text-[#E6EDF7]">0</span>
+          </div>
+          <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Лучший балл</span>
+            <span id="journalStatBest" class="font-mono font-bold text-base text-[#2563EB]">--</span>
+          </div>
+          <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Статус PRO</span>
+            <span id="journalStatPro" class="font-bold text-xs text-amber-500">Free</span>
+          </div>
+        </div>
+
+        <!-- Progress Trend Chart -->
+        <div class="p-4 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
+          <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7] mb-2 flex items-center justify-between">
+            <span>Динамика итогового балла PSL</span>
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] font-normal">Хронология</span>
+          </h4>
+          <div class="h-44 w-full">
+            <canvas id="journalChartCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- List of Saved Scans -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]">Сохранённые сканы</h4>
+            <button id="btnClearJournal" class="text-[11px] text-rose-600 dark:text-rose-400 hover:underline cursor-pointer">
+              Очистить историю
+            </button>
+          </div>
+          <div id="journalScansList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <!-- Populated dynamically via JS -->
+            <p class="text-xs text-center text-[#52627A] dark:text-[#8E9EB5] py-4">Журнал пуст. Сделайте замер и нажмите «В журнал».</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2343,8 +2826,9 @@
             audio: false,
             video: {
               facingMode: cameraFacingMode,
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+              width: { ideal: 1280, max: 1280 },
+              height: { ideal: 720, max: 720 },
+              frameRate: { ideal: 30, max: 30 }
             }
           };
 
@@ -2403,6 +2887,199 @@
         }
         animationFrameId = requestAnimationFrame(processVideoFrame);
       }
+
+      
+      // ==========================================
+      // GOOGLE PLAY & CAPACITOR ROADMAP LOGIC
+      // ==========================================
+
+      // 1. IndexedDB Local Storage for Progress Journal
+      const DB_NAME = 'PSL_Face_Analyzer_DB';
+      const DB_VERSION = 1;
+      const STORE_NAME = 'scans';
+
+      function openJournalDB() {
+        return new Promise((resolve, reject) => {
+          if (!window.indexedDB) {
+            reject(new Error('IndexedDB not supported'));
+            return;
+          }
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+          request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+            }
+          };
+          request.onsuccess = (e) => resolve(e.target.result);
+          request.onerror = (e) => reject(e.target.error);
+        });
+      }
+
+      async function saveScanToJournal(scanData) {
+        try {
+          const db = await openJournalDB();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.add(scanData);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        } catch (err) {
+          console.warn('Failed to save scan to IndexedDB:', err);
+        }
+      }
+
+      async function getAllScansFromJournal() {
+        try {
+          const db = await openJournalDB();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => reject(req.error);
+          });
+        } catch (err) {
+          console.warn('Failed to read scans from IndexedDB:', err);
+          return [];
+        }
+      }
+
+      async function clearAllScansFromJournal() {
+        try {
+          const db = await openJournalDB();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const req = store.clear();
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+          });
+        } catch (err) {
+          console.warn('Failed to clear scans:', err);
+        }
+      }
+
+      // 2. PRO Membership & Subscription State
+      function isUserPro() {
+        return localStorage.getItem('psl_pro_active') === 'true';
+      }
+
+      function setUserProStatus(active, plan = 'annual') {
+        if (active) {
+          localStorage.setItem('psl_pro_active', 'true');
+          localStorage.setItem('psl_pro_plan', plan);
+        } else {
+          localStorage.removeItem('psl_pro_active');
+          localStorage.removeItem('psl_pro_plan');
+        }
+        updateProBadgesUI();
+      }
+
+      function updateProBadgesUI() {
+        const isPro = isUserPro();
+        const btnPro = document.getElementById('btnOpenPaywall');
+        const journalPro = document.getElementById('journalStatPro');
+        if (btnPro) {
+          if (isPro) {
+            btnPro.className = 'px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer';
+            btnPro.innerHTML = '<span>💎</span> <span>PRO АКТИВЕН</span>';
+          } else {
+            btnPro.className = 'px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer';
+            btnPro.innerHTML = '<span>⭐</span> <span id="txtBtnPro">PRO</span>';
+          }
+        }
+        if (journalPro) {
+          journalPro.textContent = isPro ? 'Active PRO' : 'Free';
+          journalPro.className = isPro ? 'font-bold text-xs text-emerald-500' : 'font-bold text-xs text-amber-500';
+        }
+      }
+
+      // 3. Journal UI & Chart Rendering
+      let journalChartInstance = null;
+
+      async function renderJournalUI() {
+        const scans = await getAllScansFromJournal();
+        const statTotal = document.getElementById('journalStatTotal');
+        const statBest = document.getElementById('journalStatBest');
+        const scansList = document.getElementById('journalScansList');
+        const chartCanvas = document.getElementById('journalChartCanvas');
+
+        if (statTotal) statTotal.textContent = scans.length;
+        if (scans.length > 0) {
+          const maxScore = Math.max(...scans.map(s => s.score || 0));
+          if (statBest) statBest.textContent = maxScore.toFixed(1);
+        } else {
+          if (statBest) statBest.textContent = '--';
+        }
+
+        if (scansList) {
+          if (scans.length === 0) {
+            scansList.innerHTML = '<p class="text-xs text-center text-[#52627A] dark:text-[#8E9EB5] py-4">Журнал пуст. Сделайте замер и нажмите «В журнал».</p>';
+          } else {
+            scansList.innerHTML = scans.slice().reverse().map(s => {
+              const date = new Date(s.timestamp).toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              });
+              const modelBadge = s.model === 'asian' ? '⛩️ K-Aesthetics' : '🏛️ Western';
+              return `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45] text-xs">
+                  <div class="flex items-center gap-2.5">
+                    ${s.thumb ? `<img src="${s.thumb}" class="w-9 h-9 rounded-lg object-cover border border-[#CBD5E1]" />` : '<div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center font-bold text-blue-600">👤</div>'}
+                    <div>
+                      <div class="flex items-center gap-1.5 font-bold text-[#0F172A] dark:text-[#E6EDF7]">
+                        <span>${s.score.toFixed(1)} PSL</span>
+                        <span class="text-[10px] font-mono text-[#52627A] dark:text-[#8E9EB5]">(${s.tier || 'MTN'})</span>
+                      </div>
+                      <div class="text-[10px] text-[#52627A] dark:text-[#8E9EB5]">
+                        ${modelBadge} • ${date}
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">Сохранено</span>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+
+        // Render trend chart
+        if (chartCanvas && window.Chart) {
+          if (journalChartInstance) journalChartInstance.destroy();
+          const labels = scans.map((_, i) => '#' + (i + 1));
+          const dataPoints = scans.map(s => s.score);
+
+          journalChartInstance = new Chart(chartCanvas, {
+            type: 'line',
+            data: {
+              labels: labels.length > 0 ? labels : ['#1'],
+              datasets: [{
+                label: 'PSL Score',
+                data: dataPoints.length > 0 ? dataPoints : [7.0],
+                borderColor: '#2563EB',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: '#2563EB',
+                pointRadius: 4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { min: 2, max: 9, grid: { color: 'rgba(209, 222, 238, 0.25)' } },
+                x: { grid: { display: false } }
+              }
+            }
+          });
+        }
+      }
+
 
       // ==========================================
       // ON RESULTS HANDLER WITH EMA SMOOTHING
@@ -5935,6 +6612,246 @@
         if (methodologyModal) {
           methodologyModal.addEventListener('click', (e) => {
             if (e.target === methodologyModal) methodologyModal.classList.add('hidden');
+          });
+        }
+
+        // --- APK Phone Testing & Telegram Distribution Controls ---
+        const btnOpenApkModal = document.getElementById('btnOpenApkModal');
+        const modalApkPhoneTransfer = document.getElementById('modalApkPhoneTransfer');
+        const btnCloseApkModal = document.getElementById('btnCloseApkModal');
+        const btnCancelApkModal = document.getElementById('btnCancelApkModal');
+
+        const tabBtnApkTelegram = document.getElementById('tabBtnApkTelegram');
+        const tabBtnApkGithub = document.getElementById('tabBtnApkGithub');
+        const tabBtnApkQr = document.getElementById('tabBtnApkQr');
+        const tabBtnApkAdb = document.getElementById('tabBtnApkAdb');
+
+        const tabContentApkTelegram = document.getElementById('tabContentApkTelegram');
+        const tabContentApkGithub = document.getElementById('tabContentApkGithub');
+        const tabContentApkQr = document.getElementById('tabContentApkQr');
+        const tabContentApkAdb = document.getElementById('tabContentApkAdb');
+
+        const inputApkBotToken = document.getElementById('apkTelegramBotToken');
+        const inputApkChatId = document.getElementById('apkTelegramChatId');
+        const chkRememberTelegramCreds = document.getElementById('chkRememberTelegramCreds');
+        const btnTestTelegram = document.getElementById('btnTestTelegram');
+        const btnSendApkTelegram = document.getElementById('btnSendApkTelegram');
+        const apkTelegramStatus = document.getElementById('apkTelegramStatus');
+
+        const imgApkLiveQr = document.getElementById('imgApkLiveQr');
+        const txtApkLiveUrl = document.getElementById('txtApkLiveUrl');
+        const btnCopyLiveUrl = document.getElementById('btnCopyLiveUrl');
+
+        // Restore saved Telegram credentials if any
+        try {
+          const savedToken = localStorage.getItem('psl_tg_bot_token');
+          const savedChatId = localStorage.getItem('psl_tg_chat_id');
+          if (savedToken && inputApkBotToken) inputApkBotToken.value = savedToken;
+          if (savedChatId && inputApkChatId) inputApkChatId.value = savedChatId;
+        } catch (e) {
+          console.warn('localStorage access failed:', e);
+        }
+
+        // Tab Switcher Helper
+        function switchApkTab(activeTab) {
+          const tabs = [
+            { btn: tabBtnApkTelegram, content: tabContentApkTelegram, id: 'telegram' },
+            { btn: tabBtnApkGithub, content: tabContentApkGithub, id: 'github' },
+            { btn: tabBtnApkQr, content: tabContentApkQr, id: 'qr' },
+            { btn: tabBtnApkAdb, content: tabContentApkAdb, id: 'adb' },
+          ];
+
+          tabs.forEach(t => {
+            if (t.id === activeTab) {
+              t.btn.classList.add('bg-[#2563EB]', 'text-white', 'shadow-xs');
+              t.btn.classList.remove('text-[#52627A]', 'dark:text-[#8E9EB5]');
+              t.content.classList.remove('hidden');
+            } else {
+              t.btn.classList.remove('bg-[#2563EB]', 'text-white', 'shadow-xs');
+              t.btn.classList.add('text-[#52627A]', 'dark:text-[#8E9EB5]');
+              t.content.classList.add('hidden');
+            }
+          });
+
+          if (activeTab === 'qr') {
+            updateQrCodeView();
+          }
+        }
+
+        function updateQrCodeView() {
+          const currentUrl = window.location.href;
+          if (txtApkLiveUrl) txtApkLiveUrl.textContent = currentUrl;
+          if (imgApkLiveQr) {
+            imgApkLiveQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(currentUrl)}`;
+          }
+        }
+
+        if (tabBtnApkTelegram) tabBtnApkTelegram.addEventListener('click', () => switchApkTab('telegram'));
+        if (tabBtnApkGithub) tabBtnApkGithub.addEventListener('click', () => switchApkTab('github'));
+        if (tabBtnApkQr) tabBtnApkQr.addEventListener('click', () => switchApkTab('qr'));
+        if (tabBtnApkAdb) tabBtnApkAdb.addEventListener('click', () => switchApkTab('adb'));
+
+        if (btnOpenApkModal && modalApkPhoneTransfer) {
+          btnOpenApkModal.addEventListener('click', () => {
+            modalApkPhoneTransfer.classList.remove('hidden');
+            updateQrCodeView();
+          });
+        }
+
+        if (btnCloseApkModal && modalApkPhoneTransfer) {
+          btnCloseApkModal.addEventListener('click', () => modalApkPhoneTransfer.classList.add('hidden'));
+        }
+        if (btnCancelApkModal && modalApkPhoneTransfer) {
+          btnCancelApkModal.addEventListener('click', () => modalApkPhoneTransfer.classList.add('hidden'));
+        }
+        if (modalApkPhoneTransfer) {
+          modalApkPhoneTransfer.addEventListener('click', (e) => {
+            if (e.target === modalApkPhoneTransfer) modalApkPhoneTransfer.classList.add('hidden');
+          });
+        }
+
+        if (btnCopyLiveUrl) {
+          btnCopyLiveUrl.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+              btnCopyLiveUrl.textContent = '✅ Скопировано!';
+              setTimeout(() => { btnCopyLiveUrl.textContent = '📋 Скопировать ссылку'; }, 2000);
+            });
+          });
+        }
+
+        // Test Connection with Telegram Bot
+        if (btnTestTelegram) {
+          btnTestTelegram.addEventListener('click', async () => {
+            const token = inputApkBotToken?.value?.trim();
+            const chatId = inputApkChatId?.value?.trim();
+
+            if (!token || !chatId) {
+              if (apkTelegramStatus) {
+                apkTelegramStatus.className = 'p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs font-mono text-red-600 dark:text-red-400 min-h-[44px] flex items-center';
+                apkTelegramStatus.textContent = '⚠️ Пожалуйста, введите и Bot Token, и Chat ID.';
+              }
+              return;
+            }
+
+            if (chkRememberTelegramCreds?.checked) {
+              try {
+                localStorage.setItem('psl_tg_bot_token', token);
+                localStorage.setItem('psl_tg_chat_id', chatId);
+              } catch (e) {}
+            }
+
+            if (apkTelegramStatus) {
+              apkTelegramStatus.className = 'p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs font-mono text-blue-600 dark:text-blue-400 min-h-[44px] flex items-center';
+              apkTelegramStatus.textContent = '⏳ Отправка тестового запроса в Telegram...';
+            }
+
+            try {
+              const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: '👋 *PSL Face Analyzer:* Связь с ботом успешно проверена!\n\nТестовые сборки APK и ссылки на обновления будут приходить прямо в этот чат на вашем смартфоне.',
+                  parse_mode: 'Markdown'
+                })
+              });
+
+              const data = await res.json();
+              if (data.ok) {
+                if (apkTelegramStatus) {
+                  apkTelegramStatus.className = 'p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-600 dark:text-emerald-400 min-h-[44px] flex items-center';
+                  apkTelegramStatus.textContent = '✅ Успешно! Проверьте Telegram на вашем телефоне — сообщение доставлено.';
+                }
+              } else {
+                if (apkTelegramStatus) {
+                  apkTelegramStatus.className = 'p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs font-mono text-red-600 dark:text-red-400 min-h-[44px] flex items-center';
+                  apkTelegramStatus.textContent = `❌ Ошибка Telegram: ${data.description || 'Неверный токен или Chat ID'}`;
+                }
+              }
+            } catch (err) {
+              if (apkTelegramStatus) {
+                apkTelegramStatus.className = 'p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono text-amber-600 dark:text-amber-400 min-h-[44px] flex items-center';
+                apkTelegramStatus.textContent = `⚠️ Сетевая ошибка при обращении к api.telegram.org: ${err.message}. Проверьте соединение или используйте GitHub Actions.`;
+              }
+            }
+          });
+        }
+
+        // Send APK / Build Notification to Telegram
+        if (btnSendApkTelegram) {
+          btnSendApkTelegram.addEventListener('click', async () => {
+            const token = inputApkBotToken?.value?.trim();
+            const chatId = inputApkChatId?.value?.trim();
+
+            if (!token || !chatId) {
+              if (apkTelegramStatus) {
+                apkTelegramStatus.className = 'p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs font-mono text-red-600 dark:text-red-400 min-h-[44px] flex items-center';
+                apkTelegramStatus.textContent = '⚠️ Пожалуйста, заполните токен бота и Chat ID.';
+              }
+              return;
+            }
+
+            if (chkRememberTelegramCreds?.checked) {
+              try {
+                localStorage.setItem('psl_tg_bot_token', token);
+                localStorage.setItem('psl_tg_chat_id', chatId);
+              } catch (e) {}
+            }
+
+            if (apkTelegramStatus) {
+              apkTelegramStatus.className = 'p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs font-mono text-blue-600 dark:text-blue-400 min-h-[44px] flex items-center';
+              apkTelegramStatus.textContent = '⏳ Формирование пакета обновлений и отправка в Telegram на ваш телефон...';
+            }
+
+            try {
+              const currentUrl = window.location.href;
+              const dateStr = new Date().toLocaleString();
+              const message = `🚀 *PSL Face Analyzer — Новая версия для тестирования!*
+
+📅 *Время:* ${dateStr}
+📱 *Платформа:* Android (Capacitor WebView 720p 30 FPS)
+✨ *Нововведения в сборке:*
+• Исправлен захват фото в момент снимка для расчётов
+• Полная расширенная разметка точек и линий на лице для PDF
+• Экспорт отчёта с выбором модели (Western PSL vs East Asian)
+• Медицинский дисклеймер для модерации Google Play
+• Оптимизация 720p под WebView средних смартфонов
+• JIT-разрешения галереи для Android 13+ (Photo Picker)
+
+🔗 *Мгновенный Live-тест на телефоне:*
+${currentUrl}
+
+📦 *Автоматическая сборка APK:*
+Сделайте коммит в репозиторий — GitHub Actions скомпилирует \`app-debug.apk\` и автоматически пришлет файл прямо сюда!`;
+
+              const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: message,
+                  parse_mode: 'Markdown'
+                })
+              });
+
+              const data = await res.json();
+              if (data.ok) {
+                if (apkTelegramStatus) {
+                  apkTelegramStatus.className = 'p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-600 dark:text-emerald-400 min-h-[44px] flex items-center';
+                  apkTelegramStatus.textContent = '✅ Успешно! Ссылка и пакет тестирования отправлены на ваш телефон в Telegram.';
+                }
+              } else {
+                if (apkTelegramStatus) {
+                  apkTelegramStatus.className = 'p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs font-mono text-red-600 dark:text-red-400 min-h-[44px] flex items-center';
+                  apkTelegramStatus.textContent = `❌ Ошибка Telegram: ${data.description || 'Не удалось отправить сообщение'}`;
+                }
+              }
+            } catch (err) {
+              if (apkTelegramStatus) {
+                apkTelegramStatus.className = 'p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono text-amber-600 dark:text-amber-400 min-h-[44px] flex items-center';
+                apkTelegramStatus.textContent = `⚠️ Ошибка: ${err.message}. Проверьте соединение.`;
+              }
+            }
           });
         }
       });
