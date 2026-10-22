@@ -2,7 +2,7 @@
 <html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title id="pageTitle">PSL Face Analyzer — Craniofacial Anthropometry & Looksmaxing Ratios</title>
     <meta id="metaDesc" name="description" content="Scientific facial anthropometry and looksmaxing ratios analyzer. Real-time 468-point Face Mesh tracking, 11-point precision alignment, and clinical cephalometric benchmarks." />
     <meta property="og:title" content="PSL Face Analyzer — Craniofacial Anthropometry & Looksmaxing Ratios" />
@@ -71,48 +71,47 @@
       }
     </script>
 
-
-    <style>body{color:#0f172a;-webkit-font-smoothing:antialiased;background-color:#e6edf7;font-family:Plus Jakarta Sans,sans-serif}.dark body{color:#e6edf7;background-color:#0b0f1a}.font-mono{font-family:JetBrains Mono,monospace}@keyframes scanGuideLine{0%{opacity:.15;transform:translateY(-100%)}50%{opacity:.6}to{opacity:.15;transform:translateY(100%)}}.scan-motion-beam{animation:3.2s cubic-bezier(.4,0,.2,1) infinite scanGuideLine}</style>
+    <style>:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}*,:before,:after{box-sizing:border-box}html,body{color:#0f172a;-webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-tap-highlight-color:transparent;background-color:#e6edf7;width:100%;max-width:100vw;margin:0;padding:0;font-family:Plus Jakarta Sans,sans-serif;overflow-x:hidden}.dark html,.dark body{color:#e6edf7;background-color:#0b0f1a}.font-mono{font-family:JetBrains Mono,monospace}.pt-safe{padding-top:max(env(safe-area-inset-top,0px), 0px)}.pb-safe{padding-bottom:max(env(safe-area-inset-bottom,0px), 0px)}@keyframes scanGuideLine{0%{opacity:.15;transform:translateY(-100%)}50%{opacity:.6}to{opacity:.15;transform:translateY(100%)}}.scan-motion-beam{animation:3.2s cubic-bezier(.4,0,.2,1) infinite scanGuideLine}</style>
   </head>
   <body class="min-h-screen bg-[#E6EDF7] dark:bg-[#0B0F1A] text-[#0F172A] dark:text-[#E6EDF7] transition-colors duration-200">
     <!-- Top Global Header -->
-    <header class="sticky top-0 z-40 bg-white/90 dark:bg-[#131B2E]/90 backdrop-blur-md border-b border-[#D1DEEE] dark:border-[#202C45]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-[#131B2E]/90 backdrop-blur-md border-b border-[#D1DEEE] dark:border-[#202C45] pt-safe">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Brand & Title -->
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white font-mono font-bold text-base shadow-sm">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white font-mono font-bold text-sm sm:text-base shadow-sm">
             <span>Φ</span>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-base sm:text-lg font-bold tracking-tight text-[#0F172A] dark:text-[#E6EDF7]">
-                PSL Face Analyzer
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <h1 class="text-sm sm:text-lg font-bold tracking-tight text-[#0F172A] dark:text-[#E6EDF7] truncate">
+                PSL Face
               </h1>
-              <span id="txtHeaderBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold bg-[#DCE6F2] dark:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#BDCCE0] dark:border-[#202C45]">
-                FRONTAL 0°
+              <span id="txtHeaderBadge" class="text-[9px] sm:text-[10px] font-mono px-1.5 sm:px-2 py-0.5 rounded-md font-semibold bg-[#DCE6F2] dark:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#BDCCE0] dark:border-[#202C45] shrink-0">
+                0°
               </span>
             </div>
-            <p id="txtHeaderSubtitle" class="text-xs text-[#52627A] dark:text-[#8E9EB5] hidden sm:block">
+            <p id="txtHeaderSubtitle" class="text-xs text-[#52627A] dark:text-[#8E9EB5] hidden md:block">
               Anthropometric facial analysis aligned with looksmaxing community standards
             </p>
           </div>
         </div>
 
         <!-- Aesthetic Model Switcher (Western PSL vs East Asian K-Looks) -->
-        <div class="flex items-center bg-[#F3F7FC] dark:bg-[#172033] p-1 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold" title="Выбор модели эстетики">
-          <button id="btnModelWestern" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer bg-[#2563EB] text-white shadow-xs">
+        <div class="flex items-center bg-[#F3F7FC] dark:bg-[#172033] p-0.5 sm:p-1 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold shrink-0" title="Выбор модели эстетики">
+          <button id="btnModelWestern" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer bg-[#2563EB] text-white shadow-xs">
             <span>🇪🇺</span>
-            <span id="txtBtnModelWestern" class="hidden sm:inline">Western PSL</span>
+            <span id="txtBtnModelWestern" class="hidden md:inline">Western</span>
           </button>
-          <button id="btnModelAsian" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7]">
+          <button id="btnModelAsian" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7]">
             <span>🇰🇷</span>
-            <span id="txtBtnModelAsian" class="hidden sm:inline">East Asian</span>
+            <span id="txtBtnModelAsian" class="hidden md:inline">Asian</span>
           </button>
         </div>
 
-        <!-- Mode Switcher Tabs (Camera vs Photo Upload) -->
-        <nav class="flex items-center bg-[#F3F7FC] dark:bg-[#172033] p-1 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold">
+        <!-- Mode Switcher Tabs (Camera vs Photo Upload - desktop only, mobile has segmented tab & bottom bar) -->
+        <nav class="hidden md:flex items-center bg-[#F3F7FC] dark:bg-[#172033] p-1 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold shrink-0">
           <button id="navModeCameraBtn" class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-[#2563EB] text-white shadow-xs cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -128,12 +127,12 @@
         </nav>
 
         <!-- Right Quick Controls: Language Selector, Theme Toggle & Methodology Guide -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           
           <!-- Language Selector Dropdown -->
           <div class="relative flex items-center">
             <label for="langSelect" class="sr-only">Language</label>
-            <div class="flex items-center gap-1 bg-white dark:bg-[#172033] px-2 py-1 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold">
+            <div class="flex items-center gap-1 bg-white dark:bg-[#172033] px-1.5 sm:px-2 py-1 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold">
               <span class="text-xs text-[#52627A] dark:text-[#8E9EB5]">🌐</span>
               <select id="langSelect" class="bg-transparent text-[#0F172A] dark:text-[#E6EDF7] font-semibold text-xs cursor-pointer focus:outline-hidden" title="Select Language">
                 <option value="en" class="text-black">EN</option>
@@ -144,65 +143,78 @@
           </div>
 
           <!-- Journal & Progress Button -->
-          <button id="btnOpenJournal" class="px-2.5 py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold" title="Журнал замеров и динамика">
+          <button id="btnOpenJournal" class="hidden sm:flex px-2 sm:px-2.5 py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors cursor-pointer items-center gap-1.5 text-xs font-semibold" title="Журнал замеров и динамика">
             <span>📈</span>
             <span class="hidden md:inline" id="txtBtnJournal">Прогресс</span>
           </button>
 
           <!-- PRO Membership Button -->
-          <button id="btnOpenPaywall" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer" title="PRO Подписка">
+          <button id="btnOpenPaywall" class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1 cursor-pointer" title="PRO Подписка">
             <span>⭐</span>
             <span id="txtBtnPro">PRO</span>
           </button>
 
           <!-- APK on Phone Testing Button -->
-          <button id="btnOpenApkModal" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer" title="Отправить .APK на телефон / Тестирование">
+          <button id="btnOpenApkModal" class="hidden sm:flex px-2 sm:px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-xs items-center gap-1.5 cursor-pointer" title="Отправить .APK на телефон / Тестирование">
             <span>📱</span>
-            <span class="hidden sm:inline" id="txtBtnApk">APK на телефон</span>
+            <span class="hidden md:inline" id="txtBtnApk">APK</span>
           </button>
 
           <!-- Theme Toggle Button (Light / Dark) -->
-          <button id="themeToggleBtn" class="px-2.5 py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium" title="Switch Theme">
+          <button id="themeToggleBtn" class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium" title="Switch Theme">
             <span id="themeIconSun" class="hidden">☀️</span>
             <span id="themeIconMoon">🌙</span>
-            <span id="themeLabelText" class="hidden sm:inline">Theme</span>
+            <span id="themeLabelText" class="hidden md:inline">Theme</span>
           </button>
 
           <!-- Methodology Reference Button -->
-          <button id="openMethodologyBtn" class="px-3 py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Scientific Methodology & Community Standards">
+          <button id="openMethodologyBtn" class="p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-[#0F172A] dark:text-[#E6EDF7] bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Scientific Methodology & Community Standards">
             <svg class="w-3.5 h-3.5 text-[#52627A] dark:text-[#8E9EB5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span id="txtBtnMethodology" class="hidden md:inline">Guide & Ideals</span>
+            <span id="txtBtnMethodology" class="hidden md:inline">Guide</span>
           </button>
         </div>
       </div>
     </header>
 
     <!-- Main Workspace Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-6 flex flex-col gap-3.5 sm:gap-6 pb-24 md:pb-8 overflow-x-hidden w-full max-w-full">
       
       <!-- Top Notification Bar -->
-      <div id="statusNotificationBar" class="p-3 rounded-xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] flex items-center justify-between gap-3 shadow-xs">
-        <div class="flex items-center gap-2.5 min-w-0">
+      <div id="statusNotificationBar" class="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] flex items-center justify-between gap-2.5 sm:gap-3 shadow-xs">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
           <div id="statusIndicatorBadge" class="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></div>
           <span id="statusNotificationText" class="text-xs text-[#0F172A] dark:text-[#E6EDF7] font-medium truncate">
-            Initializing Face Mesh... Look directly into the camera lens with a neutral expression.
+            Look directly into the camera lens with a neutral expression.
           </span>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <span id="badgePassedSummary" class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#F3F7FC] dark:bg-[#172033] text-[#52627A] dark:text-[#8E9EB5] font-semibold">
-            0 / 11 conditions
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span id="badgePassedSummary" class="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#F3F7FC] dark:bg-[#172033] text-[#52627A] dark:text-[#8E9EB5] font-semibold">
+            0 / 11
           </span>
         </div>
       </div>
 
       <!-- Live Workspace Grid: Camera Stage (Left 8 cols) & 11 Criteria Checklist (Right 4 cols) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         
         <!-- Left Stage: Video / Upload Viewport -->
-        <section class="lg:col-span-8 flex flex-col gap-3">
-          <div id="stageContainer" class="relative w-full aspect-[4/3] min-h-[380px] sm:min-h-[480px] md:min-h-[520px] rounded-2xl overflow-hidden bg-[#0B0F1A] border border-[#D1DEEE] dark:border-[#202C45] shadow-sm flex items-center justify-center" style="aspect-ratio: 4/3; min-height: 420px; width: 100%;">
+        <section class="lg:col-span-8 flex flex-col gap-2.5 sm:gap-3">
+          
+          <!-- Mobile Mode Switcher Tabs (Camera vs Photo Upload) -->
+          <div class="flex md:hidden items-center justify-center p-1 bg-white dark:bg-[#131B2E] rounded-xl border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold shadow-xs">
+            <button id="navMobileCamTab" class="flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 bg-[#2563EB] text-white shadow-xs cursor-pointer min-h-[40px]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              <span id="txtMobileCamTab">Камера</span>
+            </button>
+            <button id="navMobileUploadTab" class="flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer min-h-[40px]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span id="txtMobileUploadTab">Загрузка фото</span>
+            </button>
+          </div>
+
+          <div id="stageContainer" class="relative w-full h-[48vh] min-h-[290px] max-h-[460px] sm:h-auto sm:aspect-[4/3] rounded-2xl overflow-hidden bg-[#0B0F1A] border border-[#D1DEEE] dark:border-[#202C45] shadow-sm flex items-center justify-center">
             
             <!-- Floating Reset Photo & Resolution Badge (Visible in Upload mode when photo is loaded) -->
             <div class="absolute top-4 right-4 z-30 pointer-events-auto flex items-center gap-2">
@@ -348,45 +360,45 @@
           </div>
 
           <!-- Primary Bottom Controls Bar -->
-          <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs">
-            <div class="flex items-center gap-2">
-              <button id="btnToggleCameraFacing" class="p-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] text-[#0F172A] dark:text-[#E6EDF7] hover:bg-[#D1DEEE] dark:hover:bg-[#202C45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors text-xs font-semibold cursor-pointer" title="Switch Camera">
+          <div class="flex items-center justify-between gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <button id="btnToggleCameraFacing" class="p-2 sm:p-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] text-[#0F172A] dark:text-[#E6EDF7] hover:bg-[#D1DEEE] dark:hover:bg-[#202C45] border border-[#D1DEEE] dark:border-[#202C45] transition-colors text-xs font-semibold cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center" title="Переключить камеру">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
               </button>
-              <button id="btnLoadDemoFromBottom" class="px-3 py-2 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer">
+              <button id="btnLoadDemoFromBottom" class="px-2.5 sm:px-3 py-2 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer min-h-[44px] hidden sm:block">
                 Demo Test
               </button>
             </div>
 
             <!-- Primary Trigger Snapshot Button -->
-            <button id="btnTriggerSnapshot" class="px-6 py-2.5 rounded-xl font-bold text-xs bg-[#2563EB] hover:bg-[#1D4ED8] text-white transition-all shadow-md flex items-center gap-2 cursor-pointer">
+            <button id="btnTriggerSnapshot" class="flex-1 sm:flex-none justify-center px-4 sm:px-6 py-2.5 rounded-xl font-bold text-xs bg-[#2563EB] hover:bg-[#1D4ED8] text-white transition-all shadow-md flex items-center gap-2 cursor-pointer min-h-[44px]">
               <span class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-              <span id="btnSnapshotText">TAKE SNAPSHOT & ANALYZE</span>
+              <span id="btnSnapshotText" class="truncate">СДЕЛАТЬ СНИМОК И АНАЛИЗ</span>
             </button>
           </div>
         </section>
 
         <!-- Right Side: 11-Condition Real-time Clinical Protocol Checklist -->
-        <aside class="lg:col-span-4 flex flex-col gap-4">
-          <div class="p-4 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs flex flex-col gap-3">
+        <aside class="lg:col-span-4 flex flex-col gap-3">
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs flex flex-col gap-2.5 sm:gap-3">
             
             <!-- Progress Status Ring & Header -->
-            <div class="flex items-center justify-between pb-3 border-b border-[#D1DEEE] dark:border-[#202C45]">
-              <div>
-                <span id="txtReadinessHeader" class="text-[11px] font-mono uppercase tracking-wider text-[#52627A] dark:text-[#8E9EB5] block font-semibold">
+            <div class="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-[#D1DEEE] dark:border-[#202C45]">
+              <div class="min-w-0 pr-2">
+                <span id="txtReadinessHeader" class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-[#52627A] dark:text-[#8E9EB5] block font-semibold truncate">
                   Analysis Readiness
                 </span>
-                <h3 id="coachReadinessTitle" class="text-sm font-bold text-[#0F172A] dark:text-[#E6EDF7] mt-0.5">
+                <h3 id="coachReadinessTitle" class="text-xs sm:text-sm font-bold text-[#0F172A] dark:text-[#E6EDF7] mt-0.5 truncate">
                   Aligning pose...
                 </h3>
-                <p id="coachReadinessSub" class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">
-                  Fulfill criteria for precise anthropometric measurement
+                <p id="coachReadinessSub" class="text-[10px] sm:text-[11px] text-[#52627A] dark:text-[#8E9EB5] truncate">
+                  Fulfill criteria for precise measurement
                 </p>
               </div>
-              <div class="relative w-12 h-12 flex items-center justify-center shrink-0">
-                <svg class="w-12 h-12 -rotate-90" viewBox="0 0 52 52">
+              <div class="relative w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
+                <svg class="w-11 h-11 sm:w-12 sm:h-12 -rotate-90" viewBox="0 0 52 52">
                   <circle cx="26" cy="26" r="23" stroke="currentColor" stroke-width="4" fill="transparent" class="text-[#D1DEEE] dark:text-[#202C45]" />
                   <circle id="coachRingProgress" cx="26" cy="26" r="23" stroke="#2563EB" stroke-width="4" stroke-dasharray="144.5" stroke-dashoffset="144.5" stroke-linecap="round" fill="transparent" class="transition-all duration-300" />
                 </svg>
@@ -394,14 +406,20 @@
               </div>
             </div>
 
-            <!-- Header of criteria list -->
-            <div class="flex items-center justify-between">
-              <span id="txtCriteriaHeader" class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]">11 Precision Criteria (Frontal 0°)</span>
-              <span id="txtCriteriaSub" class="text-[10px] font-mono text-[#52627A] dark:text-[#8E9EB5]">CLINICAL PROTOCOL</span>
-            </div>
+            <!-- Header of criteria list + Mobile accordion toggle -->
+            <button id="btnToggleCriteriaMobile" class="w-full flex items-center justify-between py-1 text-left cursor-pointer focus:outline-hidden" type="button">
+              <div class="flex items-center gap-1.5">
+                <span id="txtCriteriaHeader" class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]">11 Precision Criteria (0°)</span>
+                <span class="lg:hidden text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold">11 условий</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="txtCriteriaSub" class="text-[10px] font-mono text-[#52627A] dark:text-[#8E9EB5] hidden sm:inline">CLINICAL PROTOCOL</span>
+                <svg id="chevronCriteriaMobile" class="w-4 h-4 text-[#52627A] dark:text-[#8E9EB5] lg:hidden transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </button>
 
-            <!-- Items Container -->
-            <div class="flex flex-col gap-1.5 text-xs">
+            <!-- Items Container (Collapsible on mobile, always visible on desktop lg:flex) -->
+            <div id="criteriaListContainer" class="hidden lg:flex flex-col gap-1.5 text-xs">
               
               <!-- 1. Face Detected -->
               <div id="condRowDetected" class="flex items-center justify-between p-2 rounded-lg bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
@@ -507,16 +525,16 @@
       </div>
 
       <!-- Analysis Results Section (Populated upon snapshot) -->
-      <section id="resultsSection" class="hidden flex flex-col gap-6 pt-4 border-t border-[#D1DEEE] dark:border-[#202C45]">
+      <section id="resultsSection" class="hidden flex flex-col gap-4 sm:gap-6 pt-4 border-t border-[#D1DEEE] dark:border-[#202C45]">
         
         <!-- Header & Action Buttons -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs">
           <div>
             <div class="flex items-center gap-2">
-              <h2 id="txtResultsTitle" class="text-xl font-bold text-[#0F172A] dark:text-[#E6EDF7]">
+              <h2 id="txtResultsTitle" class="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-[#E6EDF7]">
                 Anthropometric PSL Evaluation Report
               </h2>
-              <span id="txtResultsBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold bg-[#2563EB] text-white">
+              <span id="txtResultsBadge" class="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold bg-[#2563EB] text-white">
                 FRONTAL 0°
               </span>
             </div>
@@ -524,32 +542,32 @@
               Calibrated against looksmaxing community standards and craniofacial anthropometry
             </p>
           </div>
-          <div class="flex items-center gap-2">
-            <button id="btnCopyReport" class="px-3 py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Copy Report">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button id="btnCopyReport" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Copy Report">
               <span>📋</span> <span id="txtBtnCopy">Copy</span>
             </button>
-            <button id="btnDownloadReport" class="px-3 py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Download PNG Report">
+            <button id="btnDownloadReport" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Download PNG Report">
               <span>📥</span> <span id="txtBtnDownload">Download PNG</span>
             </button>
-            <button id="btnExportPdf" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white border border-red-500/80 text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5" title="Экспорт отчёта в PDF">
+            <button id="btnExportPdf" class="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white border border-red-500/80 text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5" title="Экспорт отчёта в PDF">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
               <span id="txtBtnExportPdf">Экспорт в PDF</span>
             </button>
-            <button id="btnSaveToJournal" class="px-3 py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Сохранить в журнал">
+            <button id="btnSaveToJournal" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Сохранить в журнал">
               <span>💾</span> <span id="txtBtnSaveJournal">В журнал</span>
             </button>
-            <button id="btnRetakeAnalysis" class="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-xs cursor-pointer">
+            <button id="btnRetakeAnalysis" class="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-xs cursor-pointer">
               <span id="txtBtnNewAnalysis">New Snapshot</span>
             </button>
           </div>
         </div>
 
         <!-- Hero Score Banner Card -->
-        <div class="p-6 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
-          <div class="flex items-center gap-6">
-            <div class="flex flex-col items-center justify-center w-24 h-24 rounded-2xl bg-[#0B0F1A] text-white border border-[#202C45] shadow-inner">
-              <span id="heroScoreVal" class="text-3xl font-mono font-black tracking-tight text-white">7.2</span>
-              <span id="txtScoreOutOf" class="text-[10px] font-mono text-[#8E9EB5] uppercase tracking-widest">out of 10.0</span>
+        <div class="p-4 sm:p-6 rounded-2xl bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] shadow-xs flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+          <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 w-full md:w-auto">
+            <div class="flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#0B0F1A] text-white border border-[#202C45] shadow-inner shrink-0">
+              <span id="heroScoreVal" class="text-2xl sm:text-3xl font-mono font-black tracking-tight text-white">7.2</span>
+              <span id="txtScoreOutOf" class="text-[9px] sm:text-[10px] font-mono text-[#8E9EB5] uppercase tracking-widest">out of 10.0</span>
             </div>
             <div>
               <div class="flex items-center gap-2">
@@ -737,6 +755,32 @@
         </div>
       </section>
     </main>
+
+    <!-- Mobile Fixed Bottom Navigation Bar (Visible on mobile only) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#131B2E]/95 backdrop-blur-md border-t border-[#D1DEEE] dark:border-[#202C45] pb-safe shadow-lg">
+      <div class="grid grid-cols-5 h-14 items-center px-1">
+        <button id="btnMobileNavCamera" class="flex flex-col items-center justify-center py-1 text-[#2563EB] min-h-[44px] cursor-pointer" type="button">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          <span class="text-[9.5px] font-semibold mt-0.5" id="txtMobileBottomCam">Камера</span>
+        </button>
+        <button id="btnMobileNavUpload" class="flex flex-col items-center justify-center py-1 text-[#52627A] dark:text-[#8E9EB5] min-h-[44px] cursor-pointer" type="button">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <span class="text-[9.5px] font-semibold mt-0.5" id="txtMobileBottomUpload">Фото</span>
+        </button>
+        <button id="btnMobileNavReport" class="flex flex-col items-center justify-center py-1 text-[#52627A] dark:text-[#8E9EB5] min-h-[44px] cursor-pointer" type="button">
+          <span class="text-base leading-none">📊</span>
+          <span class="text-[9.5px] font-semibold mt-1" id="txtMobileBottomReport">Отчёт</span>
+        </button>
+        <button id="btnMobileNavJournal" class="flex flex-col items-center justify-center py-1 text-[#52627A] dark:text-[#8E9EB5] min-h-[44px] cursor-pointer" type="button">
+          <span class="text-base leading-none">📈</span>
+          <span class="text-[9.5px] font-semibold mt-1" id="txtMobileBottomJournal">Прогресс</span>
+        </button>
+        <button id="btnMobileNavPro" class="flex flex-col items-center justify-center py-1 text-amber-500 min-h-[44px] cursor-pointer" type="button">
+          <span class="text-base leading-none">⭐</span>
+          <span class="text-[9.5px] font-semibold mt-1">PRO</span>
+        </button>
+      </div>
+    </nav>
 
     <!-- Aesthetic Model Selection Modal (Launch prompt & switchable anytime) -->
     <div id="modalAestheticModel" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -2323,6 +2367,18 @@
 
         const txtNavUpload = document.getElementById('txtNavUpload');
         if (txtNavUpload) txtNavUpload.textContent = t('navUpload');
+
+        const txtMobileCamTab = document.getElementById('txtMobileCamTab');
+        if (txtMobileCamTab) txtMobileCamTab.textContent = t('navCamera');
+
+        const txtMobileUploadTab = document.getElementById('txtMobileUploadTab');
+        if (txtMobileUploadTab) txtMobileUploadTab.textContent = t('navUpload');
+
+        const txtMobileBottomCam = document.getElementById('txtMobileBottomCam');
+        if (txtMobileBottomCam) txtMobileBottomCam.textContent = t('navCamera');
+
+        const txtMobileBottomUpload = document.getElementById('txtMobileBottomUpload');
+        if (txtMobileBottomUpload) txtMobileBottomUpload.textContent = t('navUpload');
 
         // Aesthetic Model Selectors & Modal
         const txtBtnModelWestern = document.getElementById('txtBtnModelWestern');
@@ -6252,12 +6308,37 @@
         // Navigation Mode Tabs
         const navModeCameraBtn = document.getElementById('navModeCameraBtn');
         const navModeUploadBtn = document.getElementById('navModeUploadBtn');
+        const navMobileCamTab = document.getElementById('navMobileCamTab');
+        const navMobileUploadTab = document.getElementById('navMobileUploadTab');
+        const btnMobileNavCamera = document.getElementById('btnMobileNavCamera');
+        const btnMobileNavUpload = document.getElementById('btnMobileNavUpload');
+        const btnMobileNavReport = document.getElementById('btnMobileNavReport');
+        const btnMobileNavJournal = document.getElementById('btnMobileNavJournal');
+        const btnMobileNavPro = document.getElementById('btnMobileNavPro');
+        const btnToggleCriteriaMobile = document.getElementById('btnToggleCriteriaMobile');
+        const criteriaListContainer = document.getElementById('criteriaListContainer');
+        const chevronCriteriaMobile = document.getElementById('chevronCriteriaMobile');
 
-                if (navModeCameraBtn) {
+        function syncMobileNavUI(mode) {
+          if (mode === 'camera') {
+            if (navMobileCamTab) navMobileCamTab.className = 'flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 bg-[#2563EB] text-white shadow-xs cursor-pointer min-h-[40px]';
+            if (navMobileUploadTab) navMobileUploadTab.className = 'flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer min-h-[40px]';
+            if (btnMobileNavCamera) btnMobileNavCamera.className = 'flex flex-col items-center justify-center py-1 text-[#2563EB] min-h-[44px] cursor-pointer';
+            if (btnMobileNavUpload) btnMobileNavUpload.className = 'flex flex-col items-center justify-center py-1 text-[#52627A] dark:text-[#8E9EB5] min-h-[44px] cursor-pointer';
+          } else {
+            if (navMobileCamTab) navMobileCamTab.className = 'flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer min-h-[40px]';
+            if (navMobileUploadTab) navMobileUploadTab.className = 'flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 bg-[#2563EB] text-white shadow-xs cursor-pointer min-h-[40px]';
+            if (btnMobileNavCamera) btnMobileNavCamera.className = 'flex flex-col items-center justify-center py-1 text-[#52627A] dark:text-[#8E9EB5] min-h-[44px] cursor-pointer';
+            if (btnMobileNavUpload) btnMobileNavUpload.className = 'flex flex-col items-center justify-center py-1 text-[#2563EB] min-h-[44px] cursor-pointer';
+          }
+        }
+
+        if (navModeCameraBtn) {
           navModeCameraBtn.addEventListener('click', () => {
             currentMode = 'camera';
             navModeCameraBtn.className = 'px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-[#2563EB] text-white shadow-xs cursor-pointer';
             navModeUploadBtn.className = 'px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer';
+            syncMobileNavUI('camera');
             uploadZoneOverlay.classList.add('hidden');
             photoControlsToolbar.classList.add('hidden');
             const btnFloating = document.getElementById('btnFloatingResetPhoto');
@@ -6278,6 +6359,7 @@
             currentMode = 'upload';
             navModeUploadBtn.className = 'px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-[#2563EB] text-white shadow-xs cursor-pointer';
             navModeCameraBtn.className = 'px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer';
+            syncMobileNavUI('upload');
             cameraStartPrompt.classList.add('hidden');
             webcamVideo.classList.add('hidden');
             webcamVideo.pause();
@@ -6293,6 +6375,45 @@
               if (btnFloating) btnFloating.classList.remove('hidden');
               renderUploadTransform();
               scheduleUploadReanalysis();
+            }
+          });
+        }
+
+        // Mobile Controls Listeners
+        if (navMobileCamTab) navMobileCamTab.addEventListener('click', () => navModeCameraBtn?.click());
+        if (navMobileUploadTab) navMobileUploadTab.addEventListener('click', () => navModeUploadBtn?.click());
+        if (btnMobileNavCamera) btnMobileNavCamera.addEventListener('click', () => {
+          navModeCameraBtn?.click();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        if (btnMobileNavUpload) btnMobileNavUpload.addEventListener('click', () => {
+          navModeUploadBtn?.click();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        if (btnMobileNavReport) btnMobileNavReport.addEventListener('click', () => {
+          const resultsSec = document.getElementById('resultsSection');
+          if (resultsSec) {
+            resultsSec.classList.remove('hidden');
+            resultsSec.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+        if (btnMobileNavJournal) btnMobileNavJournal.addEventListener('click', () => {
+          document.getElementById('btnOpenJournal')?.click();
+        });
+        if (btnMobileNavPro) btnMobileNavPro.addEventListener('click', () => {
+          document.getElementById('btnOpenPaywall')?.click();
+        });
+
+        // Mobile Criteria Collapsible
+        if (btnToggleCriteriaMobile && criteriaListContainer) {
+          btnToggleCriteriaMobile.addEventListener('click', () => {
+            const isHidden = criteriaListContainer.classList.contains('hidden');
+            if (isHidden) {
+              criteriaListContainer.classList.remove('hidden');
+              if (chevronCriteriaMobile) chevronCriteriaMobile.classList.add('rotate-180');
+            } else {
+              criteriaListContainer.classList.add('hidden');
+              if (chevronCriteriaMobile) chevronCriteriaMobile.classList.remove('rotate-180');
             }
           });
         }
