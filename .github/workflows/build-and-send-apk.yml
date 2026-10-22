@@ -19,10 +19,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0'
+
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -71,16 +83,11 @@ jobs:
         if: env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != ''
         continue-on-error: true
         run: |
-          echo "Sending APK to Telegram chat: ${{ env.TELEGRAM_CHAT_ID }}..."
-          CAPTION="🚀 PSL Face Analyzer — Свежая сборка APK!
-          📦 Размер: ${{ steps.apk_info.outputs.apk_size }}
-          ⏱ Собрано: ${{ env.BUILD_TIME }}
-          👉 Нажмите на файл в Telegram, чтобы установить приложение на смартфон."
-
-          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot${{ env.TELEGRAM_BOT_TOKEN }}/sendDocument" \
-               -F "chat_id=${{ env.TELEGRAM_CHAT_ID }}" \
+          echo "Sending APK to Telegram chat: $TELEGRAM_CHAT_ID..."
+          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+               -F "chat_id=${TELEGRAM_CHAT_ID}" \
                -F "document=@${{ steps.apk_info.outputs.apk_path }};filename=PSL_Analyzer_Debug.apk" \
-               -F "caption=$CAPTION")
+               -F "caption=🚀 PSL Face Analyzer APK собран успешно! Размер: ${{ steps.apk_info.outputs.apk_size }}. Время: ${{ env.BUILD_TIME }}")
           
           echo "Telegram Response: $RESPONSE"
 
