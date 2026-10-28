@@ -71,10 +71,15 @@
       }
     </script>
 
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
       :root {
-        --sat: env(safe-area-inset-top, 0px);
-        --sab: env(safe-area-inset-bottom, 0px);
+        --tg-safe-top: var(--tg-safe-area-inset-top, var(--tg-content-safe-area-inset-top, env(safe-area-inset-top, 0px)));
+        --tg-safe-bottom: var(--tg-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+        --sat: max(var(--tg-safe-top), env(safe-area-inset-top, 0px));
+        --sab: max(var(--tg-safe-bottom), env(safe-area-inset-bottom, 0px));
       }
       *, *::before, *::after {
         box-sizing: border-box;
@@ -100,10 +105,10 @@
         font-family: 'JetBrains Mono', monospace;
       }
       .pt-safe {
-        padding-top: max(env(safe-area-inset-top, 0px), 0px);
+        padding-top: max(var(--sat), 0px);
       }
       .pb-safe {
-        padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+        padding-bottom: max(var(--sab), 0px);
       }
       /* Subtle scan line animation exclusively on active camera feed */
       @keyframes scanGuideLine {
@@ -271,7 +276,7 @@
               </button>
             </div>
             <!-- Video & Canvas Layers -->
-            <video id="webcamVideo" class="absolute inset-0 w-full h-full object-cover -scale-x-100 z-0" playsinline muted autoplay></video>
+            <video id="webcamVideo" class="absolute inset-0 w-full h-full object-cover -scale-x-100 z-0" playsinline webkit-playsinline muted autoplay></video>
             <canvas id="stageCanvas" class="absolute inset-0 w-full h-full object-cover -scale-x-100 pointer-events-none z-10"></canvas>
 
             <!-- Active Motion Subtle Scanner Beam -->
@@ -322,19 +327,35 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
               </div>
-              <h3 id="txtCamPromptTitle" class="text-base font-bold mb-1 text-[#E6EDF7]">Launch Frontal Camera</h3>
+              <h3 id="txtCamPromptTitle" class="text-base font-bold mb-1 text-[#E6EDF7]">Камера для замера 0° Frontal</h3>
               <p id="txtCamPromptDesc" class="text-xs text-[#8E9EB5] max-w-md mb-4">
-                Camera access is required for precise optical measurement. Biometric data is processed strictly locally inside your browser.
+                Для анализа пропорций лица включите веб-камеру, загрузите своё фото из галереи или выберите готовый пресет для мгновенного теста.
               </p>
-              <div class="flex items-center gap-3">
+              <div class="flex flex-wrap justify-center items-center gap-2.5 mb-4">
                 <button id="btnStartCamera" class="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                  <span id="txtBtnEnableCam">Enable Camera</span>
+                  <span id="txtBtnEnableCam">Включить камеру</span>
                 </button>
                 <button id="btnSwitchToUploadPrompt" class="px-3.5 py-2 rounded-xl bg-[#172033] hover:bg-[#1E2B45] text-[#8E9EB5] hover:text-[#E6EDF7] border border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  <span id="txtBtnUploadInstead">Upload photo instead</span>
+                  <span id="txtBtnUploadInstead">Загрузить фото</span>
                 </button>
+              </div>
+
+              <!-- Quick 1-Click Demo Profiles Directly on Screen -->
+              <div class="flex flex-col sm:flex-row items-center gap-2 pt-3 border-t border-[#202C45] text-xs">
+                <span class="text-[#8E9EB5] text-[11px]">Мгновенный тест без камеры:</span>
+                <div class="flex items-center gap-1.5">
+                  <button id="btnPromptDemoChad" class="px-2.5 py-1 rounded-lg font-mono font-bold bg-[#172033] hover:bg-[#1E2B45] text-amber-400 border border-[#202C45] transition-colors cursor-pointer text-[11px]">
+                    ⭐ Chad (7.8)
+                  </button>
+                  <button id="btnPromptDemoNormie" class="px-2.5 py-1 rounded-lg font-mono font-medium bg-[#172033] hover:bg-[#1E2B45] text-blue-400 border border-[#202C45] transition-colors cursor-pointer text-[11px]">
+                    👤 Normie (5.2)
+                  </button>
+                  <button id="btnPromptDemoSub5" class="px-2.5 py-1 rounded-lg font-mono font-medium bg-[#172033] hover:bg-[#1E2B45] text-rose-400 border border-[#202C45] transition-colors cursor-pointer text-[11px]">
+                    ⚠️ Sub-5 (3.8)
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -586,6 +607,10 @@
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <button id="btnSendToTelegram" class="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-[#2AABEE] to-[#229ED9] hover:from-[#229ED9] hover:to-[#1E88E5] text-white font-bold text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1.5" title="Отправить полный PDF-отчёт в ваш диалог с Telegram ботом">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
+              <span id="txtBtnSendToTelegram">В чат Telegram</span>
+            </button>
             <button id="btnCopyReport" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-[#172033] hover:bg-[#F3F7FC] dark:hover:bg-[#1E2B45] text-[#0F172A] dark:text-[#E6EDF7] border border-[#D1DEEE] dark:border-[#202C45] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5" title="Copy Report">
               <span>📋</span> <span id="txtBtnCopy">Copy</span>
             </button>
@@ -1219,14 +1244,18 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#D1DEEE] dark:border-[#202C45]">
-          <button id="btnCancelPdfExport" class="px-4 py-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] hover:bg-[#E2ECF8] dark:hover:bg-[#1E2B45] text-[#52627A] dark:text-[#8E9EB5] text-xs font-semibold transition-colors cursor-pointer">
+        <div class="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-[#D1DEEE] dark:border-[#202C45]">
+          <button id="btnCancelPdfExport" class="px-3.5 py-2.5 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] hover:bg-[#E2ECF8] dark:hover:bg-[#1E2B45] text-[#52627A] dark:text-[#8E9EB5] text-xs font-semibold transition-colors cursor-pointer">
             <span id="txtBtnCancelPdf">Отмена</span>
           </button>
-          <button id="btnConfirmPdfExport" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
+          <button id="btnSendModalPdfTelegram" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2AABEE] to-[#229ED9] hover:from-[#229ED9] hover:to-[#1E88E5] text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
+            <span id="txtBtnSendModalPdfTelegram">Отправить в чат Telegram</span>
+          </button>
+          <button id="btnConfirmPdfExport" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer">
             <svg id="pdfIconReady" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             <span id="pdfIconSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            <span id="txtBtnConfirmPdf">Сформировать и скачать PDF</span>
+            <span id="txtBtnConfirmPdf">Скачать PDF</span>
           </button>
         </div>
 
@@ -1292,7 +1321,7 @@
       </div>
     </div>
 
-    <!-- Modal: PRO Looksmaxing Club (Paywall - Monthly, Annual & Lifetime) -->
+    <!-- Modal: Telegram Stars Shop & PRO Access (50 Stars PDF, 150 Stars Lifetime, 50 Stars AI breakdown) -->
     <div id="modalPaywall" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
       <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto relative">
         <button id="btnClosePaywallModal" class="absolute top-4 right-4 p-1.5 rounded-xl text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer" title="Закрыть">
@@ -1301,164 +1330,295 @@
 
         <!-- Header -->
         <div class="flex flex-col items-center text-center pt-2">
-          <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-2">
-            ⭐ PRO LOOKSMAXING CLUB
+          <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-2 flex items-center gap-1.5">
+            <span>⭐</span> TELEGRAM STARS (XTR)
           </span>
           <h3 class="font-black text-xl text-[#0F172A] dark:text-[#E6EDF7] tracking-tight">
-            Разблокируйте полный потенциал
+            Официальные микроплатежи Stars
           </h3>
           <p class="text-xs text-[#52627A] dark:text-[#8E9EB5] mt-1 max-w-sm">
-            Неограниченные PDF-отчёты с разметкой, углублённые протоколы и журнал динамики
+            Прямая оплата звёздами внутри Telegram без внешних подписок и ввода банковских карт
           </p>
         </div>
 
         <!-- Features Included -->
         <div class="grid grid-cols-2 gap-2 text-[11px] font-semibold text-[#0F172A] dark:text-[#E6EDF7] p-3 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
           <div class="flex items-center gap-1.5">
-            <span class="text-emerald-500 font-bold">✓</span>
-            <span>Экспорт PDF с разметкой</span>
+            <span class="text-amber-500 font-bold">★</span>
+            <span>Мгновенный ответ бота (&lt;10с)</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="text-emerald-500 font-bold">✓</span>
+            <span class="text-amber-500 font-bold">★</span>
+            <span>Доставка PDF прямо в чат</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-amber-500 font-bold">★</span>
             <span>Все 11 метрик лица</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="text-emerald-500 font-bold">✓</span>
-            <span>Гайды по софтмаксингу</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-emerald-500 font-bold">✓</span>
-            <span>Журнал прогресса во времени</span>
+            <span class="text-amber-500 font-bold">★</span>
+            <span>Синхронизация профиля TG</span>
           </div>
         </div>
 
-        <!-- 3 Tariff Plans (No weekly plan to avoid churn!) -->
-        <div class="space-y-2.5">
-          <!-- Annual Plan (Best Value) -->
-          <label id="planCardAnnual" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#2563EB] bg-blue-50/50 dark:bg-blue-950/20 cursor-pointer transition-all">
+        <!-- 3 Telegram Stars Products (50 Stars PDF, 199 Stars 30-Day Program, 50 Stars AI) -->
+        <div class="space-y-2.5" id="starsProductsContainer">
+          <!-- 199 Stars: 30-Day Transformation Program (Default Selected) -->
+          <label id="starCardTransformation" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 cursor-pointer transition-all">
             <div class="flex items-center gap-3">
-              <input type="radio" name="paywallPlanRadio" value="annual" checked class="w-4 h-4 text-[#2563EB] accent-[#2563EB]" />
+              <input type="radio" name="paywallPlanRadio" value="transformation_30d" checked class="w-4 h-4 text-amber-500 accent-amber-500" />
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Годовой план</span>
-                  <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-red-600 text-white">ХИТ • СКИДКА 50%</span>
+                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">30-дневная программа трансформации</span>
+                  <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-white">ПРОГРАММА</span>
                 </div>
-                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">$2.50 в месяц ($29.99 / год)</p>
+                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Утренние протоколы (09:00), вечерние чеки (20:30), замеры каждые 5 дней и аналитика</p>
               </div>
             </div>
-            <span class="font-mono font-black text-sm text-[#0F172A] dark:text-[#E6EDF7]">$29.99</span>
+            <div class="flex items-center gap-1 bg-amber-500/15 px-2.5 py-1 rounded-xl border border-amber-500/40 shrink-0">
+              <span class="text-base text-amber-500">⭐</span>
+              <span class="font-mono font-black text-sm text-amber-600 dark:text-amber-400">199</span>
+            </div>
           </label>
 
-          <!-- Monthly Plan (with 3-day trial) -->
-          <label id="planCardMonthly" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-blue-400 bg-white dark:bg-[#172033] cursor-pointer transition-all">
+          <!-- 50 Stars: PDF Report to Chat -->
+          <label id="starCardPdf" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-amber-400 bg-white dark:bg-[#172033] cursor-pointer transition-all">
             <div class="flex items-center gap-3">
-              <input type="radio" name="paywallPlanRadio" value="monthly" class="w-4 h-4 text-[#2563EB] accent-[#2563EB]" />
+              <input type="radio" name="paywallPlanRadio" value="pdf_report" class="w-4 h-4 text-amber-500 accent-amber-500" />
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Месячный план</span>
-                  <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-emerald-600 text-white">3 ДНЯ ТРИАЛ</span>
+                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Разовый клинический PDF-разбор</span>
+                  <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-blue-600 text-white">РАЗБОР</span>
                 </div>
-                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">3 дня бесплатно, затем $4.99 / месяц</p>
+                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Полная антропометрическая карта лица и доставка 4-страничного файла в диалог</p>
               </div>
             </div>
-            <span class="font-mono font-black text-sm text-[#0F172A] dark:text-[#E6EDF7]">$4.99</span>
+            <div class="flex items-center gap-1 bg-amber-500/15 px-2.5 py-1 rounded-xl border border-amber-500/40 shrink-0">
+              <span class="text-base text-amber-500">⭐</span>
+              <span class="font-mono font-black text-sm text-amber-600 dark:text-amber-400">50</span>
+            </div>
           </label>
 
-          <!-- Lifetime Pass -->
-          <label id="planCardLifetime" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-purple-400 bg-white dark:bg-[#172033] cursor-pointer transition-all">
+          <!-- 50 Stars: Deep AI Breakdown -->
+          <label id="starCardAi" class="relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-amber-400 bg-white dark:bg-[#172033] cursor-pointer transition-all">
             <div class="flex items-center gap-3">
-              <input type="radio" name="paywallPlanRadio" value="lifetime" class="w-4 h-4 text-purple-600 accent-purple-600" />
+              <input type="radio" name="paywallPlanRadio" value="ai_deep_breakdown" class="w-4 h-4 text-amber-500 accent-amber-500" />
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">Навсегда (Lifetime)</span>
-                  <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-purple-600 text-white">РАЗОВЫЙ ПЛАТЁЖ</span>
+                  <span class="font-bold text-sm text-[#0F172A] dark:text-[#E6EDF7]">AI-разбор проблемной зоны</span>
+                  <span class="px-2 py-0.5 rounded-md text-[9px] font-bold bg-violet-600 text-white">АНАТОМИЯ</span>
                 </div>
-                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Полный доступ без подписок</p>
+                <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Биомеханический анализ челюсти, периорбитальной зоны или подбородка</p>
               </div>
             </div>
-            <span class="font-mono font-black text-sm text-[#0F172A] dark:text-[#E6EDF7]">$49.99</span>
+            <div class="flex items-center gap-1 bg-amber-500/15 px-2.5 py-1 rounded-xl border border-amber-500/40 shrink-0">
+              <span class="text-base text-amber-500">⭐</span>
+              <span class="font-mono font-black text-sm text-amber-600 dark:text-amber-400">50</span>
+            </div>
           </label>
         </div>
+
+        <!-- Feedback & Status Notification in Modal -->
+        <div id="starsPayStatus" class="hidden p-3 rounded-2xl text-xs font-mono"></div>
 
         <!-- Action Button -->
         <button id="btnSubscribePro" class="w-full py-3.5 rounded-2xl font-bold text-sm bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white transition-all shadow-md cursor-pointer flex items-center justify-center gap-2">
-          <span id="txtBtnSubscribeLabel">Активировать PRO доступ</span>
+          <span>⭐</span>
+          <span id="txtBtnSubscribeLabel">Оплатить 199 Stars в Telegram</span>
         </button>
 
-        <!-- Google Play Footer with Restore Purchases -->
+        <!-- Telegram Native Guarantee Footer -->
         <div class="flex items-center justify-between text-[11px] text-[#52627A] dark:text-[#8E9EB5] pt-1 border-t border-[#D1DEEE] dark:border-[#202C45]">
-          <button id="btnRestorePurchases" class="hover:underline font-semibold cursor-pointer">
-            Восстановить покупки
-          </button>
-          <span>Google Play Subscriptions</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-blue-500 font-bold">✓</span>
+            <span>Официальный платёж Telegram Bot API</span>
+          </div>
+          <span class="font-mono font-semibold text-amber-600 dark:text-amber-400">Telegram Stars (XTR)</span>
         </div>
       </div>
     </div>
 
-    <!-- Modal: History Progress Journal (IndexedDB Storage & Chart) -->
-    <div id="modalHistoryJournal" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
-      <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto relative">
+    <!-- Modal: History Progress Journal & 30-Day Transformation -->
+    <div id="modalHistoryJournal" class="fixed inset-0 z-50 bg-[#0B0F1A]/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 hidden">
+      <div class="bg-white dark:bg-[#131B2E] border border-[#D1DEEE] dark:border-[#202C45] rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto relative">
         <button id="btnCloseJournalModal" class="absolute top-4 right-4 p-1.5 rounded-xl text-[#52627A] dark:text-[#8E9EB5] hover:text-[#0F172A] dark:hover:text-[#E6EDF7] cursor-pointer" title="Закрыть">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
         <!-- Header -->
-        <div class="flex items-center gap-3 pb-3 border-b border-[#D1DEEE] dark:border-[#202C45]">
-          <div class="w-10 h-10 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl font-bold">
-            📈
-          </div>
-          <div>
-            <h3 class="font-extrabold text-lg text-[#0F172A] dark:text-[#E6EDF7] tracking-tight">
-              Журнал прогресса и замеров
-            </h3>
-            <p class="text-xs text-[#52627A] dark:text-[#8E9EB5]">
-              Локальная база данных (IndexedDB): отслеживание изменений пропорций во времени
-            </p>
+        <div class="flex items-center justify-between pb-3 border-b border-[#D1DEEE] dark:border-[#202C45] pr-8">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl font-bold shadow-md">
+              📈
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-extrabold text-lg text-[#0F172A] dark:text-[#E6EDF7] tracking-tight">
+                  Прогресс & 30-дневная программа
+                </h3>
+                <span id="journalSyncBadge" class="hidden sm:inline text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                  ☁️ Серверная синхронизация
+                </span>
+              </div>
+              <p class="text-xs text-[#52627A] dark:text-[#8E9EB5]">
+                Оценка с погрешностью ±0.1 PSL, пошаговые протоколы и контроль каждые 5 дней
+              </p>
+            </div>
           </div>
         </div>
 
-        <!-- Quick Stats -->
+        <!-- 30-Day Softmaxing Transformation Banner & Today Habit Checklist -->
+        <div id="progPlanSection" class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-50/70 via-indigo-50/50 to-purple-50/70 dark:from-[#172033] dark:via-[#1A243B] dark:to-[#172033] border border-blue-200/80 dark:border-blue-900/40 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-blue-600 text-white" id="badgePlanDay">
+                ДЕНЬ 1 ИЗ 30
+              </span>
+              <span class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]" id="txtPlanMissionTitle">
+                Базовый замер 0° & Освоение вакуумного Mewing
+              </span>
+            </div>
+            <span class="text-[11px] font-mono text-[#52627A] dark:text-[#8E9EB5]" id="txtPlanProgressPct">
+              0% пройдено
+            </span>
+          </div>
+
+          <!-- Mission text -->
+          <p class="text-xs text-[#0F172A] dark:text-[#E6EDF7] leading-relaxed bg-white/70 dark:bg-[#0B0F1A]/60 p-3 rounded-xl border border-blue-100 dark:border-[#202C45]" id="txtPlanMissionBody">
+            🎯 Сделайте базовый снимок 0° Frontal для точки отсчёта. Сегодня осваиваем биомеханический Mewing: прижатие именно ЗАДНЕЙ трети языка к мягкому нёбу (suction hold), а не только кончика.
+          </p>
+
+          <!-- Habit completion button & Control Scan Banner -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-[#131B2E] px-3 py-2 rounded-xl border border-[#D1DEEE] dark:border-[#202C45] hover:border-emerald-500 transition-all">
+              <input type="checkbox" id="chkHabitDoneToday" class="w-4 h-4 text-emerald-600 accent-emerald-600 rounded cursor-pointer" />
+              <span class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]" id="lblHabitDoneToday">
+                Отметить задание на сегодня выполненным
+              </span>
+            </label>
+
+            <div id="bannerControlScanReminder" class="hidden text-xs font-semibold px-3 py-1.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/40 flex items-center gap-1.5">
+              <span>📸</span>
+              <span>День контрольного замера! Сделайте скан 0°.</span>
+            </div>
+          </div>
+
+          <!-- Unlocked plan promo if not subscriber -->
+          <div id="boxUnlockPlanPromo" class="hidden p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 flex items-center justify-between gap-3">
+            <div>
+              <div class="font-bold text-xs text-amber-700 dark:text-amber-400">30-дневная пошаговая программа (199 Stars)</div>
+              <div class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Ежедневные пуши 09:00 и 20:30 по вашему времени + контрольные замеры каждые 5 дней.</div>
+            </div>
+            <button id="btnUnlockPlanNow" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs">
+              Открыть за 199 ⭐
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
         <div class="grid grid-cols-3 gap-2.5 text-center">
           <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
             <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Всего замеров</span>
             <span id="journalStatTotal" class="font-mono font-bold text-base text-[#0F172A] dark:text-[#E6EDF7]">0</span>
           </div>
           <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
-            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Лучший балл</span>
-            <span id="journalStatBest" class="font-mono font-bold text-base text-[#2563EB]">--</span>
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Текущий балл (±0.1)</span>
+            <span id="journalStatCurrent" class="font-mono font-bold text-base text-[#2563EB]">--</span>
           </div>
           <div class="p-3 rounded-xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
-            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Статус PRO</span>
-            <span id="journalStatPro" class="font-bold text-xs text-amber-500">Free</span>
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] block">Прогресс от базы</span>
+            <span id="journalStatDelta" class="font-mono font-bold text-xs text-emerald-600 dark:text-emerald-400">+0.0 PSL</span>
           </div>
         </div>
 
-        <!-- Progress Trend Chart -->
+        <!-- Interactive Before/After Split Slider Section -->
+        <div class="p-4 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45] flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7] flex items-center gap-1.5">
+                <span>⚡ Сравнение До / После (Сплит-слайдер)</span>
+              </h4>
+              <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Перетаскивайте ползунок для оценки изменений челюсти и взгляда</p>
+            </div>
+            <label class="flex items-center gap-1.5 text-[11px] text-[#52627A] dark:text-[#8E9EB5] cursor-pointer">
+              <input type="checkbox" id="chkSplitLandmarks" class="rounded text-[#2563EB] accent-[#2563EB]" checked />
+              <span>Ориентиры</span>
+            </label>
+          </div>
+
+          <!-- Split-Slider Viewport (60 FPS Mobile Touch Optimized) -->
+          <div id="splitSliderContainer" class="relative w-full aspect-[4/3] max-h-[340px] rounded-2xl overflow-hidden bg-black select-none touch-none cursor-ew-resize">
+            <!-- Image Left: Day 1 (Baseline) -->
+            <img id="splitImgBefore" class="absolute inset-0 w-full h-full object-cover pointer-events-none" src="" alt="Day 1 Baseline" />
+            <!-- Image Right: Current Scan (Clipped) -->
+            <div id="splitClipRight" class="absolute inset-y-0 right-0 overflow-hidden pointer-events-none" style="left: 50%;">
+              <img id="splitImgAfter" class="absolute top-0 right-0 w-full h-full object-cover pointer-events-none" style="width: 100%; max-width: none;" src="" alt="Latest Scan" />
+            </div>
+
+            <!-- Divider Line with Grab Handle -->
+            <div id="splitHandleLine" class="absolute inset-y-0 w-1 bg-white shadow-lg pointer-events-none flex items-center justify-center" style="left: 50%;">
+              <div class="w-8 h-8 rounded-full bg-white text-slate-800 shadow-xl flex items-center justify-center text-xs font-black border-2 border-blue-600">
+                <span>↔</span>
+              </div>
+            </div>
+
+            <!-- Badges -->
+            <div class="absolute bottom-3 left-3 px-2 py-1 rounded-lg bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono pointer-events-none">
+              День 1 (База)
+            </div>
+            <div class="absolute bottom-3 right-3 px-2 py-1 rounded-lg bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono pointer-events-none">
+              Текущий скан
+            </div>
+
+            <!-- Empty Placeholder if <2 scans -->
+            <div id="splitPlaceholder" class="absolute inset-0 bg-[#0B0F1A]/90 flex flex-col items-center justify-center p-4 text-center">
+              <span class="text-3xl mb-2">📸</span>
+              <p class="text-xs text-white font-semibold">Сделайте минимум 2 замера для запуска сплит-слайдера До/После</p>
+              <p class="text-[11px] text-[#8E9EB5] mt-1">Фотографии автоматически сжимаются до 960px для плавной работы на смартфоне.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Trend Chart (±0.1 PSL Band) -->
         <div class="p-4 rounded-2xl bg-[#F3F7FC] dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45]">
-          <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7] mb-2 flex items-center justify-between">
-            <span>Динамика итогового балла PSL</span>
-            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] font-normal">Хронология</span>
-          </h4>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7] flex items-center gap-1.5">
+              <span>Динамика итогового балла</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">±0.1 PSL</span>
+            </h4>
+            <span class="text-[10px] text-[#52627A] dark:text-[#8E9EB5]">Контрольные точки каждые 5 дней</span>
+          </div>
           <div class="h-44 w-full">
             <canvas id="journalChartCanvas"></canvas>
           </div>
         </div>
 
+        <!-- Action: Save Current Scan to Journal Button -->
+        <div id="boxSaveCurrentScanAction" class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold text-emerald-800 dark:text-emerald-300">Готов свежий замер лица!</div>
+            <div class="text-[11px] text-[#52627A] dark:text-[#8E9EB5]">Зафиксировать результат текущего анализа в историю прогресса?</div>
+          </div>
+          <button id="btnSaveCurrentScanToProgress" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-xs cursor-pointer shrink-0">
+            💾 Сохранить скан
+          </button>
+        </div>
+
         <!-- List of Saved Scans -->
         <div>
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]">Сохранённые сканы</h4>
+            <h4 class="text-xs font-bold text-[#0F172A] dark:text-[#E6EDF7]">История замеров</h4>
             <button id="btnClearJournal" class="text-[11px] text-rose-600 dark:text-rose-400 hover:underline cursor-pointer">
               Очистить историю
             </button>
           </div>
-          <div id="journalScansList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-            <!-- Populated dynamically via JS -->
-            <p class="text-xs text-center text-[#52627A] dark:text-[#8E9EB5] py-4">Журнал пуст. Сделайте замер и нажмите «В журнал».</p>
+          <div id="journalScansList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            <p class="text-xs text-center text-[#52627A] dark:text-[#8E9EB5] py-4">Журнал пуст. Сделайте замер и нажмите «Сохранить скан».</p>
           </div>
         </div>
       </div>
     </div>
+
 
 
     <!-- Methodology Reference Modal -->
@@ -1488,8 +1648,93 @@
       </div>
     </footer>
 
+    <!-- Dynamic Environment & API Base Configuration -->
+    <script type="module">
+      window.VITE_API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+    </script>
+
     <!-- Core Application Logic -->
     <script>
+      function getApiUrl(endpoint) {
+        const base = (window.VITE_API_BASE_URL || '').replace(/\/$/, '');
+        if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) return endpoint;
+        return base ? `${base}${endpoint}` : endpoint;
+      }
+
+      function getTelegramHeaders(extraHeaders = {}) {
+        const initData = window.Telegram?.WebApp?.initData || '';
+        const headers = { ...extraHeaders };
+        if (initData) {
+          headers['X-Telegram-Init-Data'] = initData;
+          headers['Authorization'] = `tma ${initData}`;
+        }
+        return headers;
+      }
+
+      // Silence HMR WebSocket connection notices in cloud iframe sandbox
+      window.addEventListener('unhandledrejection', (event) => {
+        if (event.reason && (typeof event.reason.message === 'string') && (event.reason.message.includes('WebSocket') || event.reason.message.includes('ws'))) {
+          event.preventDefault();
+        }
+      });
+
+      // ==========================================
+      // GLOBAL ACCESS & PRO STATUS CONTROL
+      // ==========================================
+      let isUserPro = false;
+      let isVipOwner = false;
+
+      function setUserProStatus(isPro, planType = 'lifetime_pro') {
+        isUserPro = !!isPro;
+        if (planType === 'owner_vip') {
+          isVipOwner = true;
+          isUserPro = true;
+        } else {
+          isVipOwner = false;
+        }
+
+        const btnPro = document.getElementById('btnOpenPaywall');
+        const txtPro = document.getElementById('txtBtnPro');
+        const bottomProBtn = document.getElementById('btnMobileNavPro');
+        const headerSub = document.getElementById('txtHeaderSubtitle');
+
+        if (isVipOwner) {
+          if (btnPro) {
+            btnPro.className = 'px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40 font-bold text-xs transition-all shadow-xs flex items-center gap-1 cursor-pointer';
+            btnPro.title = 'Статус Создателя: Полный безлимитный доступ';
+          }
+          if (txtPro) txtPro.textContent = '👑 VIP';
+          if (bottomProBtn) {
+            bottomProBtn.className = 'flex flex-col items-center justify-center py-1 text-amber-500 font-bold min-h-[44px] cursor-pointer';
+          }
+          if (headerSub) {
+            headerSub.innerHTML = '👑 <strong class="text-amber-500 font-bold">@wow_ogogo VIP</strong>: Полный доступ ко всем 11 метрикам';
+          }
+        } else if (isUserPro) {
+          if (btnPro) {
+            btnPro.className = 'px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 font-bold text-xs transition-all shadow-xs flex items-center gap-1 cursor-default';
+            btnPro.title = 'Тариф PRO активен';
+          }
+          if (txtPro) txtPro.textContent = '⭐ PRO';
+          if (bottomProBtn) {
+            bottomProBtn.className = 'flex flex-col items-center justify-center py-1 text-emerald-500 font-bold min-h-[44px] cursor-pointer';
+          }
+        } else {
+          if (btnPro) {
+            btnPro.className = 'px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1 cursor-pointer animate-pulse';
+            btnPro.title = 'Разблокировать PRO за Stars';
+          }
+          if (txtPro) txtPro.textContent = 'PRO ⭐';
+          if (bottomProBtn) {
+            bottomProBtn.className = 'flex flex-col items-center justify-center py-1 text-amber-500 min-h-[44px] cursor-pointer';
+          }
+        }
+
+        if (typeof latestAnalysis !== 'undefined' && latestAnalysis) {
+          renderResultsDashboard(latestAnalysis);
+        }
+      }
+
       // ==========================================
       // AESTHETIC MODELS (WESTERN PSL VS EAST ASIAN)
       // ==========================================
@@ -2940,6 +3185,10 @@
           console.warn('Camera stream error:', err);
           cameraStartPrompt.classList.remove('hidden');
           statusNotificationText.textContent = t('statusCameraError');
+          const title = document.getElementById('txtCamPromptTitle');
+          const desc = document.getElementById('txtCamPromptDesc');
+          if (title) title.textContent = 'Доступ к веб-камере не получен';
+          if (desc) desc.textContent = 'Разрешите доступ к камере в браузере, загрузите фото из галереи или нажмите готовый пресет (Chad / Normie / Sub-5) ниже:';
         }
       }
 
@@ -3038,38 +3287,12 @@
         }
       }
 
-      // 2. PRO Membership & Subscription State
-      function isUserPro() {
-        return localStorage.getItem('psl_pro_active') === 'true';
-      }
-
-      function setUserProStatus(active, plan = 'annual') {
-        if (active) {
-          localStorage.setItem('psl_pro_active', 'true');
-          localStorage.setItem('psl_pro_plan', plan);
-        } else {
-          localStorage.removeItem('psl_pro_active');
-          localStorage.removeItem('psl_pro_plan');
-        }
-        updateProBadgesUI();
-      }
-
+      // 2. PRO Membership & Journal Status Sync
       function updateProBadgesUI() {
-        const isPro = isUserPro();
-        const btnPro = document.getElementById('btnOpenPaywall');
         const journalPro = document.getElementById('journalStatPro');
-        if (btnPro) {
-          if (isPro) {
-            btnPro.className = 'px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer';
-            btnPro.innerHTML = '<span>💎</span> <span>PRO АКТИВЕН</span>';
-          } else {
-            btnPro.className = 'px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer';
-            btnPro.innerHTML = '<span>⭐</span> <span id="txtBtnPro">PRO</span>';
-          }
-        }
         if (journalPro) {
-          journalPro.textContent = isPro ? 'Active PRO' : 'Free';
-          journalPro.className = isPro ? 'font-bold text-xs text-emerald-500' : 'font-bold text-xs text-amber-500';
+          journalPro.textContent = isUserPro ? 'Active PRO' : 'Free';
+          journalPro.className = isUserPro ? 'font-bold text-xs text-emerald-500' : 'font-bold text-xs text-amber-500';
         }
       }
 
@@ -3904,8 +4127,8 @@
         const heroVerdictDesc = document.getElementById('heroVerdictDesc');
         const txtScoreOutOf = document.getElementById('txtScoreOutOf');
 
-        if (heroScoreVal) heroScoreVal.textContent = analysis.finalScore.toFixed(1);
-        if (txtScoreOutOf) txtScoreOutOf.textContent = t('scoreOutOf');
+        if (heroScoreVal) heroScoreVal.innerHTML = `${analysis.finalScore.toFixed(1)} <span class="text-sm font-mono font-normal text-[#52627A] dark:text-[#8E9EB5]">±0.1</span>`;
+        if (txtScoreOutOf) txtScoreOutOf.textContent = '/ 10.0 PSL (±0.1)';
         if (heroTierBadge) {
           heroTierBadge.textContent = localizedTierName;
           heroTierBadge.className = `text-xs font-mono font-bold px-3 py-1 rounded-md ${tier.color}`;
@@ -3966,11 +4189,13 @@
         const tbody = document.getElementById('metricsTableBody');
         tbody.innerHTML = '';
         const metricNameDict = translations[currentLang]?.metricNames || translations.en.metricNames;
+        const freeMetricKeys = ['fwhr', 'midface', 'canthal', 'symmetry'];
 
         Object.keys(analysis.metrics).forEach(key => {
           const m = analysis.metrics[key];
           const scoreNum = parseFloat(m.score);
           const localizedName = metricNameDict[key] || key;
+          const isFree = isUserPro || freeMetricKeys.includes(key);
 
           let statusBadge = '';
           if (scoreNum >= 7.8) {
@@ -3984,15 +4209,38 @@
           }
 
           const tr = document.createElement('tr');
-          tr.className = 'hover:bg-[#F3F7FC]/80 dark:hover:bg-[#172033]/60 transition-colors';
-          tr.innerHTML = `
-            <td class="py-2.5 px-3 font-medium text-[#0F172A] dark:text-[#E6EDF7]">${localizedName}</td>
-            <td class="py-2.5 px-3 font-bold text-[#0F172A] dark:text-[#E6EDF7]">${m.val}</td>
-            <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-semibold">${m.ideal}</td>
-            <td class="py-2.5 px-3 text-[#52627A] dark:text-[#8E9EB5]">${m.avg}</td>
-            <td class="py-2.5 px-3 font-bold text-[#0F172A] dark:text-[#E6EDF7]">${m.score} / 10</td>
-            <td class="py-2.5 px-3">${statusBadge}</td>
-          `;
+          if (isFree) {
+            tr.className = 'hover:bg-[#F3F7FC]/80 dark:hover:bg-[#172033]/60 transition-colors';
+            tr.innerHTML = `
+              <td class="py-2.5 px-3 font-medium text-[#0F172A] dark:text-[#E6EDF7]">${localizedName}</td>
+              <td class="py-2.5 px-3 font-bold text-[#0F172A] dark:text-[#E6EDF7]">${m.val}</td>
+              <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-semibold">${m.ideal}</td>
+              <td class="py-2.5 px-3 text-[#52627A] dark:text-[#8E9EB5]">${m.avg}</td>
+              <td class="py-2.5 px-3 font-bold text-[#0F172A] dark:text-[#E6EDF7]">${m.score} / 10</td>
+              <td class="py-2.5 px-3">${statusBadge}</td>
+            `;
+          } else {
+            tr.className = 'hover:bg-amber-50/30 dark:hover:bg-amber-950/20 transition-colors cursor-pointer group';
+            tr.title = 'Нажмите, чтобы разблокировать в PRO';
+            tr.onclick = () => document.getElementById('btnOpenPaywall')?.click();
+            tr.innerHTML = `
+              <td class="py-2.5 px-3 font-medium text-[#0F172A] dark:text-[#E6EDF7]">
+                <div class="flex items-center gap-1.5">
+                  <span>${localizedName}</span>
+                  <span class="text-[9px] font-mono px-1 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">PRO</span>
+                </div>
+              </td>
+              <td class="py-2.5 px-3 font-bold text-[#52627A] dark:text-[#8E9EB5] select-none filter blur-xs">7.25</td>
+              <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-semibold select-none filter blur-xs">${m.ideal}</td>
+              <td class="py-2.5 px-3 text-[#52627A] dark:text-[#8E9EB5] select-none filter blur-xs">${m.avg}</td>
+              <td class="py-2.5 px-3 font-bold text-[#52627A] select-none filter blur-xs">7.5 / 10</td>
+              <td class="py-2.5 px-3">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30 group-hover:bg-amber-500/25 transition-all">
+                  🔒 Доступно в PRO
+                </span>
+              </td>
+            `;
+          }
           tbody.appendChild(tr);
         });
 
@@ -4820,8 +5068,9 @@
           });
         }
 
-        // Render all dynamically generated cards
-        cards.forEach(c => {
+        // Render dynamically generated cards with PRO restriction for free users
+        const visibleCards = isUserPro ? cards : cards.slice(0, 1);
+        visibleCards.forEach(c => {
           const div = document.createElement("div");
           div.className = `p-4 rounded-xl border flex flex-col justify-between gap-2.5 ${c.color} transition-all shadow-xs`;
           div.innerHTML = `
@@ -4838,6 +5087,26 @@
           `;
           container.appendChild(div);
         });
+
+        // If not PRO, render the Locked Protocols Paywall Teaser
+        if (!isUserPro && cards.length > 1) {
+          const hiddenCount = cards.length - 1;
+          const teaserDiv = document.createElement("div");
+          teaserDiv.className = "p-5 rounded-2xl border-2 border-dashed border-amber-500/50 bg-amber-50/40 dark:bg-amber-950/20 text-center flex flex-col items-center justify-between gap-3 shadow-xs transition-all";
+          teaserDiv.innerHTML = `
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-2xl">🔒⭐</span>
+              <h5 class="font-bold text-xs text-[#0F172A] dark:text-[#E6EDF7]">Остальные ${hiddenCount} протоколов скрыты</h5>
+              <p class="text-[11px] text-[#52627A] dark:text-[#8E9EB5] leading-relaxed">
+                Персональные инструкции по углам челюсти, Hunter Eyes, коррекции прикуса и устранению асимметрии лица доступны в тарифе PRO.
+              </p>
+            </div>
+            <button onclick="document.getElementById('btnOpenPaywall')?.click()" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white font-bold text-xs shadow-xs cursor-pointer transition-all">
+              ⭐ Разблокировать PRO (150 Stars)
+            </button>
+          `;
+          container.appendChild(teaserDiv);
+        }
       }
       
       function renderCharts(analysis) {
@@ -5657,19 +5926,11 @@
       }
 
 
-      async function generateAndDownloadPdfReport(targetModel) {
+      async function buildPdfReportDocument(targetModel) {
         if (!lastDetectedLandmarks && !latestAnalysis) {
           statusNotificationText.textContent = t('hintNoFace') || 'No face analysis available.';
-          return;
+          return null;
         }
-
-        const btnConfirm = document.getElementById('btnConfirmPdfExport');
-        const iconReady = document.getElementById('pdfIconReady');
-        const iconSpinner = document.getElementById('pdfIconSpinner');
-        const txtConfirm = document.getElementById('txtBtnConfirmPdf');
-        if (iconReady) iconReady.classList.add('hidden');
-        if (iconSpinner) iconSpinner.classList.remove('hidden');
-        if (txtConfirm) txtConfirm.textContent = t('btnGeneratingPdf') || 'Generating...';
 
         try {
           // 1. Retrieve the EXACT photo that was used for the analysis!
@@ -5678,7 +5939,7 @@
 
           if (!baseLandmarks) {
             statusNotificationText.textContent = t('hintNoFace') || 'No face analysis available.';
-            return;
+            return null;
           }
 
           const nw = basePhoto.width || stageCanvas.width || 1280;
@@ -5694,7 +5955,8 @@
           const compCtx = compCanvas.getContext('2d');
           compCtx.drawImage(basePhoto, 0, 0, nw, nh);
           renderDetailedBiometricOverlays(compCtx, baseLandmarks, nw, nh, analysis, targetModel);
-          const photoDataUrl = compCanvas.toDataURL('image/jpeg', 0.95);
+          // Compressed JPEG (0.80) to conserve memory in Telegram mobile webview
+          const photoDataUrl = compCanvas.toDataURL('image/jpeg', 0.80);
 
           const lang = currentLang || 'ru';
           const cfg = AESTHETIC_CONFIG[targetModel] || AESTHETIC_CONFIG.western;
@@ -6173,30 +6435,146 @@
             compress: true
           });
 
-          const imgData1 = canvas1.toDataURL('image/jpeg', 0.95);
+          // 0.80 Quality compression to satisfy memory and network limits in Telegram
+          const imgData1 = canvas1.toDataURL('image/jpeg', 0.80);
           doc.addImage(imgData1, 'JPEG', 0, 0, 210, 297);
 
-          const imgData2 = canvas2.toDataURL('image/jpeg', 0.95);
+          const imgData2 = canvas2.toDataURL('image/jpeg', 0.80);
           doc.addPage();
           doc.addImage(imgData2, 'JPEG', 0, 0, 210, 297);
 
-          // 8. Download PDF file
-          const fileName = `PSL_Looksmaxing_Report_${targetModel}_${Date.now()}.pdf`;
-          doc.save(fileName);
-
-          // 9. Cleanup & UI feedback
           renderContainer.innerHTML = '';
-          const modal = document.getElementById('modalPdfExport');
-          if (modal) modal.classList.add('hidden');
+          const fileName = `PSL_Looksmaxing_Report_${targetModel}_${Date.now()}.pdf`;
+          const pdfBlob = doc.output('blob');
 
-          statusNotificationText.textContent = t('statusPdfDownloaded') || 'PDF report downloaded!';
+          return { doc, pdfBlob, fileName, analysis, tierVerd };
         } catch (err) {
           console.error('Error generating PDF report:', err);
-          alert('Error generating PDF report: ' + (err.message || err));
+          renderContainer.innerHTML = '';
+          throw err;
+        }
+      }
+
+      async function generateAndDownloadPdfReport(targetModel) {
+        if (!isUserPro) {
+          const paywall = document.getElementById('modalPaywall');
+          if (paywall) {
+            updateStarsProductSelection('pdf_report');
+            paywall.classList.remove('hidden');
+          }
+          statusNotificationText.textContent = '⭐ Клинический 4-страничный PDF доступен за 50 Stars или в тарифе PRO (150 Stars).';
+          return;
+        }
+
+        const btnConfirm = document.getElementById('btnConfirmPdfExport');
+        const iconReady = document.getElementById('pdfIconReady');
+        const iconSpinner = document.getElementById('pdfIconSpinner');
+        const txtConfirm = document.getElementById('txtBtnConfirmPdf');
+        if (iconReady) iconReady.classList.add('hidden');
+        if (iconSpinner) iconSpinner.classList.remove('hidden');
+        if (txtConfirm) txtConfirm.textContent = t('btnGeneratingPdf') || 'Формирование...';
+
+        try {
+          const report = await buildPdfReportDocument(targetModel);
+          if (!report) return;
+          report.doc.save(report.fileName);
+
+          const modal = document.getElementById('modalPdfExport');
+          if (modal) modal.classList.add('hidden');
+          statusNotificationText.textContent = t('statusPdfDownloaded') || 'PDF-отчёт успешно скачан!';
+        } catch (err) {
+          alert('Ошибка генерации PDF: ' + (err.message || err));
         } finally {
           if (iconReady) iconReady.classList.remove('hidden');
           if (iconSpinner) iconSpinner.classList.add('hidden');
-          if (txtConfirm) txtConfirm.textContent = t('btnConfirmPdf') || 'Generate & Download PDF';
+          if (txtConfirm) txtConfirm.textContent = t('btnConfirmPdf') || 'Скачать PDF';
+        }
+      }
+
+      async function sendPdfReportToTelegram(targetModel) {
+        if (!isUserPro) {
+          const paywall = document.getElementById('modalPaywall');
+          if (paywall) {
+            updateStarsProductSelection('pdf_report');
+            paywall.classList.remove('hidden');
+          }
+          statusNotificationText.textContent = '⭐ Отправка PDF в диалог с ботом доступна за 50 Stars или в тарифе PRO (150 Stars).';
+          return;
+        }
+
+        const btnTg = document.getElementById('btnSendToTelegram');
+        const btnModalTg = document.getElementById('btnSendModalPdfTelegram');
+        const originalTgText = btnTg ? btnTg.innerHTML : '';
+        const originalModalText = btnModalTg ? btnModalTg.innerHTML : '';
+
+        if (btnTg) {
+          btnTg.disabled = true;
+          btnTg.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Отправка...</span>';
+        }
+        if (btnModalTg) {
+          btnModalTg.disabled = true;
+          btnModalTg.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Отправка в чат...</span>';
+        }
+
+        try {
+          statusNotificationText.textContent = '⏳ Сжатие PDF (0.80) и передача боту Telegram...';
+          const report = await buildPdfReportDocument(targetModel);
+          if (!report) return;
+
+          const { pdfBlob, fileName, analysis, tierVerd } = report;
+
+          const formData = new FormData();
+          formData.append('pdf', pdfBlob, fileName);
+          formData.append('score', String(analysis.finalScore || '7.2'));
+          formData.append('verdict', tierVerd || 'High-Tier Aesthetics');
+          formData.append('modelName', targetModel === 'asian' ? 'East Asian K-Line' : 'Western PSL');
+
+          // Pass raw initData for backend HMAC validation
+          const initData = window.Telegram?.WebApp?.initData || '';
+          formData.append('initData', initData);
+
+          const fallbackChatId = localStorage.getItem('psl_tg_chat_id') || '';
+          if (fallbackChatId) {
+            formData.append('chatId', fallbackChatId);
+          }
+
+          const res = await fetch(getApiUrl('/api/telegram/send-report'), {
+            method: 'POST',
+            headers: getTelegramHeaders(),
+            body: formData
+          });
+
+          const result = await res.json();
+          if (result.ok) {
+            statusNotificationText.textContent = '✈️ PDF успешно отправлен в ваш диалог с Telegram ботом!';
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+              window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            }
+            if (window.Telegram?.WebApp?.showAlert) {
+              window.Telegram.WebApp.showAlert('✅ Ваш клинический PDF-отчёт отправлен в чат с ботом! Проверьте диалог.');
+            } else {
+              alert('✅ Ваш клинический PDF-отчёт отправлен в чат с ботом! Проверьте диалог в Telegram.');
+            }
+            const modal = document.getElementById('modalPdfExport');
+            if (modal) modal.classList.add('hidden');
+          } else {
+            throw new Error(result.error || 'Не удалось отправить отчёт');
+          }
+        } catch (err) {
+          console.error('Error sending report to Telegram:', err);
+          if (window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+          }
+          alert('Ошибка отправки в Telegram: ' + (err.message || err));
+        } finally {
+          if (btnTg) {
+            btnTg.disabled = false;
+            btnTg.innerHTML = originalTgText;
+          }
+          if (btnModalTg) {
+            btnModalTg.disabled = false;
+            btnModalTg.innerHTML = originalModalText;
+          }
         }
       }
 
@@ -6208,6 +6586,18 @@
       // AESTHETIC MODEL SWITCHING & UI HELPERS
       // ==========================================
       function setAestheticModel(modelId, save = true) {
+        if (modelId === 'asian' && !isUserPro) {
+          if (window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+          }
+          const paywall = document.getElementById('modalPaywall');
+          if (paywall) {
+            updateStarsProductSelection('lifetime_pro');
+            paywall.classList.remove('hidden');
+          }
+          statusNotificationText.textContent = '⭐ Модель East Asian K-Line доступна в тарифе PRO (150 Stars).';
+          return;
+        }
         currentAestheticModel = modelId === 'asian' ? 'asian' : 'western';
         if (save) {
           localStorage.setItem('psl_aesthetic_model', currentAestheticModel);
@@ -6330,6 +6720,108 @@
 
         initFaceMesh();
         startLiveCamera();
+
+        // Telegram WebApp Handshake & VIP Identification
+        try {
+          // Remove any legacy global pro key so other users never inherit it
+          localStorage.removeItem('psl_user_is_pro');
+        } catch (e) {}
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryUser = urlParams.get('user') || '';
+        const tg = window.Telegram?.WebApp;
+        const tgUser = tg?.initDataUnsafe?.user;
+        const effectiveUsername = (tgUser?.username || queryUser || '').toLowerCase().replace('@', '');
+
+        // STRICT OWNER CHECK: Only @wow_ogogo gets free VIP PRO!
+        if (effectiveUsername === 'wow_ogogo') {
+          setUserProStatus(true, 'owner_vip');
+        } else {
+          // All other users start strictly in FREE mode!
+          setUserProStatus(false);
+        }
+
+        if (tg) {
+          try {
+            tg.ready();
+            tg.expand();
+            if (tg.isVersionAtLeast && tg.isVersionAtLeast('6.2') && tg.enableClosingConfirmation) {
+              tg.enableClosingConfirmation();
+            }
+
+            // Match Telegram Theme if available
+            if (tg.colorScheme === 'dark') {
+              currentTheme = 'dark';
+              applyTheme('dark');
+            }
+
+            // Sync user data & header greeting
+            if (tgUser) {
+              const headerSub = document.getElementById('txtHeaderSubtitle');
+              if (effectiveUsername === 'wow_ogogo') {
+                if (headerSub) {
+                  headerSub.innerHTML = '👑 <strong class="text-amber-500 font-bold">@wow_ogogo VIP</strong>: Полный доступ ко всем 11 метрикам';
+                }
+              } else if (headerSub) {
+                headerSub.textContent = `Добро пожаловать, ${tgUser.first_name || tgUser.username}! Научный анализ 0°`;
+              }
+
+              // Sync timezone and pre-fetch program status
+              try {
+                const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Moscow';
+                fetch(getApiUrl('/api/telegram/sync-timezone'), {
+                  method: 'POST',
+                  headers: getTelegramHeaders({ 'Content-Type': 'application/json' }),
+                  body: JSON.stringify({ userId: tgUser.id, username: effectiveUsername, timeZone: clientTz })
+                }).catch(() => {});
+              } catch (e) {}
+
+              // Check PRO status & program with server (Single Source of Truth)
+              fetch(getApiUrl(`/api/telegram/user-program?userId=${tgUser.id}&username=${effectiveUsername}`), {
+                headers: getTelegramHeaders()
+              })
+                .then(r => r.json())
+                .then(prog => {
+                  if (prog && prog.ok) {
+                    if (prog.isPro || prog.isOwner) {
+                      setUserProStatus(true, prog.isOwner ? 'owner_vip' : 'lifetime_pro');
+                    }
+                    userProgramState = {
+                      isPro: prog.isPro || effectiveUsername === 'wow_ogogo',
+                      isOwner: prog.isOwner || effectiveUsername === 'wow_ogogo',
+                      has30DayPlan: prog.has30DayPlan || effectiveUsername === 'wow_ogogo',
+                      currentDay: prog.currentDay || 1,
+                      todayMission: prog.todayMission,
+                      scans: prog.scans || [],
+                      completedHabits: prog.completedHabits || {},
+                      timeZone: prog.timeZone || 'Europe/Moscow'
+                    };
+                    try {
+                      localStorage.setItem('psl_user_program_cache', JSON.stringify(userProgramState));
+                    } catch (e) {}
+                  }
+                })
+                .catch(() => {});
+            }
+          } catch (e) {
+            console.warn('Telegram WebApp handshake error:', e);
+          }
+        }
+
+        // iOS WKWebView Camera Resilience on swipe-down / background
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            if (webcamVideo && !webcamVideo.paused) {
+              try { webcamVideo.pause(); } catch (e) {}
+            }
+          } else {
+            if (currentMode === 'camera' && webcamVideo && webcamVideo.paused && videoStream) {
+              webcamVideo.play().catch(() => {
+                startLiveCamera();
+              });
+            }
+          }
+        });
 
         // Language Select Listener
         const langSelect = document.getElementById('langSelect');
@@ -6534,6 +7026,14 @@
         if (demoSub5Btn) demoSub5Btn.addEventListener('click', () => loadSyntheticDemoProfile('sub5'));
         if (btnLoadDemoFromBottom) btnLoadDemoFromBottom.addEventListener('click', () => loadSyntheticDemoProfile('chad'));
 
+        const btnPromptDemoChad = document.getElementById('btnPromptDemoChad');
+        const btnPromptDemoNormie = document.getElementById('btnPromptDemoNormie');
+        const btnPromptDemoSub5 = document.getElementById('btnPromptDemoSub5');
+
+        if (btnPromptDemoChad) btnPromptDemoChad.addEventListener('click', () => loadSyntheticDemoProfile('chad'));
+        if (btnPromptDemoNormie) btnPromptDemoNormie.addEventListener('click', () => loadSyntheticDemoProfile('normie'));
+        if (btnPromptDemoSub5) btnPromptDemoSub5.addEventListener('click', () => loadSyntheticDemoProfile('sub5'));
+
         // Trigger Snapshot CTA
         const btnTriggerSnapshot = document.getElementById('btnTriggerSnapshot');
         if (btnTriggerSnapshot) {
@@ -6704,6 +7204,12 @@
               statusNotificationText.textContent = t('hintNoFace') || 'Please take a snapshot or load demo first.';
               return;
             }
+            if (!isUserPro) {
+              updateStarsProductSelection('pdf_report');
+              if (modalPaywall) modalPaywall.classList.remove('hidden');
+              statusNotificationText.textContent = '⭐ Экспорт полного клинического PDF доступен за 50 Stars или в тарифе PRO (150 Stars).';
+              return;
+            }
             updatePdfModelSelection(currentAestheticModel || 'western');
             modalPdfExport.classList.remove('hidden');
           });
@@ -6727,6 +7233,188 @@
           });
         }
 
+        const btnSendModalPdfTelegram = document.getElementById('btnSendModalPdfTelegram');
+        if (btnSendModalPdfTelegram) {
+          btnSendModalPdfTelegram.addEventListener('click', () => {
+            sendPdfReportToTelegram(selectedPdfModel);
+          });
+        }
+
+        const btnSendToTelegram = document.getElementById('btnSendToTelegram');
+        if (btnSendToTelegram) {
+          btnSendToTelegram.addEventListener('click', () => {
+            if (!latestAnalysis && !lastDetectedLandmarks) {
+              statusNotificationText.textContent = t('hintNoFace') || 'Please take a snapshot or load demo first.';
+              return;
+            }
+            if (!isUserPro) {
+              updateStarsProductSelection('pdf_report');
+              if (modalPaywall) modalPaywall.classList.remove('hidden');
+              statusNotificationText.textContent = '⭐ Отправка PDF в чат требует 50 Stars или тариф PRO (150 Stars).';
+              return;
+            }
+            sendPdfReportToTelegram(currentAestheticModel || 'western');
+          });
+        }
+
+        // ==========================================
+        // TELEGRAM STARS PAYWALL & STORE CONTROLS
+        // ==========================================
+        const btnOpenPaywall = document.getElementById('btnOpenPaywall');
+        const modalPaywall = document.getElementById('modalPaywall');
+        const btnClosePaywallModal = document.getElementById('btnClosePaywallModal');
+        const btnSubscribePro = document.getElementById('btnSubscribePro');
+        const starCardTransformation = document.getElementById('starCardTransformation');
+        const starCardPdf = document.getElementById('starCardPdf');
+        const starCardAi = document.getElementById('starCardAi');
+        const txtBtnSubscribeLabel = document.getElementById('txtBtnSubscribeLabel');
+
+        function updateStarsProductSelection(product) {
+          const radioTransformation = starCardTransformation?.querySelector('input[type="radio"]');
+          const radioPdf = starCardPdf?.querySelector('input[type="radio"]');
+          const radioAi = starCardAi?.querySelector('input[type="radio"]');
+
+          const activeBorder = 'relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 cursor-pointer transition-all';
+          const defaultBorder = 'relative flex items-center justify-between p-3.5 rounded-2xl border-2 border-[#D1DEEE] dark:border-[#202C45] hover:border-amber-400 bg-white dark:bg-[#172033] cursor-pointer transition-all';
+
+          const isTransformation = (product === 'transformation_30d' || product === 'lifetime_pro');
+          if (starCardTransformation) starCardTransformation.className = isTransformation ? activeBorder : defaultBorder;
+          if (starCardPdf) starCardPdf.className = (product === 'pdf_report') ? activeBorder : defaultBorder;
+          if (starCardAi) starCardAi.className = (product === 'ai_deep_breakdown') ? activeBorder : defaultBorder;
+
+          if (radioTransformation) radioTransformation.checked = isTransformation;
+          if (radioPdf) radioPdf.checked = (product === 'pdf_report');
+          if (radioAi) radioAi.checked = (product === 'ai_deep_breakdown');
+
+          if (txtBtnSubscribeLabel) {
+            if (isTransformation) {
+              txtBtnSubscribeLabel.textContent = 'Оплатить 199 Stars в Telegram';
+            } else if (product === 'pdf_report') {
+              txtBtnSubscribeLabel.textContent = 'Оплатить 50 Stars в Telegram';
+            } else {
+              txtBtnSubscribeLabel.textContent = 'Оплатить 50 Stars в Telegram';
+            }
+          }
+        }
+
+        if (starCardTransformation) starCardTransformation.addEventListener('click', () => updateStarsProductSelection('transformation_30d'));
+        if (starCardPdf) starCardPdf.addEventListener('click', () => updateStarsProductSelection('pdf_report'));
+        if (starCardAi) starCardAi.addEventListener('click', () => updateStarsProductSelection('ai_deep_breakdown'));
+
+        if (btnOpenPaywall && modalPaywall) {
+          btnOpenPaywall.addEventListener('click', () => {
+            const statusDiv = document.getElementById('starsPayStatus');
+            if (statusDiv) statusDiv.classList.add('hidden');
+            modalPaywall.classList.remove('hidden');
+          });
+        }
+        if (btnClosePaywallModal && modalPaywall) {
+          btnClosePaywallModal.addEventListener('click', () => modalPaywall.classList.add('hidden'));
+        }
+        if (modalPaywall) {
+          modalPaywall.addEventListener('click', (e) => {
+            if (e.target === modalPaywall) modalPaywall.classList.add('hidden');
+          });
+        }
+
+        async function handleTelegramStarsPayment() {
+          const selectedRadio = document.querySelector('input[name="paywallPlanRadio"]:checked');
+          const itemType = selectedRadio ? selectedRadio.value : 'lifetime_pro';
+          const initData = window.Telegram?.WebApp?.initData || '';
+
+          const btnSubscribe = document.getElementById('btnSubscribePro');
+          const statusDiv = document.getElementById('starsPayStatus');
+          const originalText = btnSubscribe ? btnSubscribe.innerHTML : '';
+
+          if (btnSubscribe) {
+            btnSubscribe.disabled = true;
+            btnSubscribe.innerHTML = '<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span> <span>Подготовка счёта Stars...</span>';
+          }
+          if (statusDiv) {
+            statusDiv.className = 'p-3 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 font-mono text-xs';
+            statusDiv.textContent = '⏳ Запрос инвойса в Telegram Bot API...';
+            statusDiv.classList.remove('hidden');
+          }
+
+          try {
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }
+
+            const res = await fetch(getApiUrl('/api/telegram/create-stars-invoice'), {
+              method: 'POST',
+              headers: getTelegramHeaders({ 'Content-Type': 'application/json' }),
+              body: JSON.stringify({ itemType, initData })
+            });
+
+            const data = await res.json();
+            if (!data.ok) {
+              throw new Error(data.error || 'Ошибка формирования счёта Stars');
+            }
+
+            if (window.Telegram?.WebApp?.openInvoice && data.invoiceLink) {
+              window.Telegram.WebApp.openInvoice(data.invoiceLink, (status) => {
+                if (status === 'paid') {
+                  setUserProStatus(true, itemType);
+                  if (statusDiv) {
+                    statusDiv.className = 'p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-semibold';
+                    statusDiv.textContent = '⭐ Оплата Stars успешно подтверждена! Функция активирована.';
+                    statusDiv.classList.remove('hidden');
+                  }
+                  if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                  }
+                  setTimeout(() => {
+                    if (modalPaywall) modalPaywall.classList.add('hidden');
+                  }, 1600);
+                } else if (status === 'cancelled') {
+                  if (statusDiv) {
+                    statusDiv.className = 'p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-semibold';
+                    statusDiv.textContent = 'Платёж Telegram Stars был отменён.';
+                    statusDiv.classList.remove('hidden');
+                  }
+                } else if (status === 'failed') {
+                  if (statusDiv) {
+                    statusDiv.className = 'p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-semibold';
+                    statusDiv.textContent = 'Ошибка платежа Stars. Пожалуйста, повторите попытку.';
+                    statusDiv.classList.remove('hidden');
+                  }
+                }
+              });
+            } else {
+              // Standalone web browser preview fallback
+              setUserProStatus(true, itemType);
+              if (statusDiv) {
+                statusDiv.className = 'p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-semibold';
+                statusDiv.textContent = '⭐ Браузерный режим: симуляция списания Stars выполнена. PRO активирован!';
+                statusDiv.classList.remove('hidden');
+              }
+              if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+              }
+              setTimeout(() => {
+                if (modalPaywall) modalPaywall.classList.add('hidden');
+              }, 1800);
+            }
+          } catch (err) {
+            console.error('Stars payment error:', err);
+            if (statusDiv) {
+              statusDiv.className = 'p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 font-semibold';
+              statusDiv.textContent = 'Ошибка Stars: ' + (err.message || err);
+              statusDiv.classList.remove('hidden');
+            }
+          } finally {
+            if (btnSubscribe) {
+              btnSubscribe.disabled = false;
+              btnSubscribe.innerHTML = originalText;
+            }
+          }
+        }
+
+        if (btnSubscribePro) {
+          btnSubscribePro.addEventListener('click', handleTelegramStarsPayment);
+        }
+
         // Download Report Button
         const btnDownloadReport = document.getElementById('btnDownloadReport');
         if (btnDownloadReport) {
@@ -6736,6 +7424,535 @@
             const comp = getCompositeSnapshotCanvas();
             link.href = comp.toDataURL('image/png');
             link.click();
+          });
+        }
+
+        // ==========================================
+        // PROGRESS & 30-DAY TRANSFORMATION PROGRAM ENGINE
+        // ==========================================
+        let userProgramState = {
+          isPro: false,
+          isOwner: false,
+          has30DayPlan: false,
+          currentDay: 1,
+          todayMission: null,
+          scans: [],
+          completedHabits: {},
+          timeZone: 'Europe/Moscow'
+        };
+
+        let progressChartInstance = null;
+
+        // Compress snapshot image on client to max 960px JPEG (0.8 quality) for 60 FPS slider performance & lightweight storage
+        function compressCanvasToThumbnail(sourceCanvas, maxWidth = 960, quality = 0.8) {
+          if (!sourceCanvas) return null;
+          const sw = sourceCanvas.width;
+          const sh = sourceCanvas.height;
+          if (sw <= 0 || sh <= 0) return null;
+
+          const scale = Math.min(1.0, maxWidth / sw);
+          const dw = Math.round(sw * scale);
+          const dh = Math.round(sh * scale);
+
+          const thumbCanvas = document.createElement('canvas');
+          thumbCanvas.width = dw;
+          thumbCanvas.height = dh;
+          const tctx = thumbCanvas.getContext('2d');
+          tctx.drawImage(sourceCanvas, 0, 0, dw, dh);
+          return thumbCanvas.toDataURL('image/jpeg', quality);
+        }
+
+        async function syncProgramWithServer() {
+          const tg = window.Telegram?.WebApp;
+          const tgUser = tg?.initDataUnsafe?.user;
+          const urlParams = new URLSearchParams(window.location.search);
+          const queryUser = urlParams.get('user') || '';
+          const effectiveUsername = (tgUser?.username || queryUser || '').toLowerCase().replace('@', '');
+          const userId = tgUser?.id || (effectiveUsername === 'wow_ogogo' ? 999999 : 0);
+
+          try {
+            // First sync client timezone
+            const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Moscow';
+            if (userId) {
+              fetch(getApiUrl('/api/telegram/sync-timezone'), {
+                method: 'POST',
+                headers: getTelegramHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ userId, username: effectiveUsername, timeZone: clientTz })
+              }).catch(() => {});
+            }
+
+            const res = await fetch(getApiUrl(`/api/telegram/user-program?userId=${userId}&username=${effectiveUsername}`), {
+              headers: getTelegramHeaders()
+            });
+            const data = await res.json();
+            if (data && data.ok) {
+              userProgramState = {
+                isPro: data.isPro || effectiveUsername === 'wow_ogogo',
+                isOwner: data.isOwner || effectiveUsername === 'wow_ogogo',
+                has30DayPlan: data.has30DayPlan || effectiveUsername === 'wow_ogogo',
+                currentDay: data.currentDay || 1,
+                todayMission: data.todayMission,
+                scans: data.scans || [],
+                completedHabits: data.completedHabits || {},
+                timeZone: data.timeZone || clientTz
+              };
+
+              // Cache in localStorage to ensure fast initial render
+              try {
+                localStorage.setItem('psl_user_program_cache', JSON.stringify(userProgramState));
+              } catch (e) {}
+
+              renderJournalProgressUI();
+            }
+          } catch (err) {
+            console.warn('Could not sync with server, falling back to local cache:', err);
+            try {
+              const cached = localStorage.getItem('psl_user_program_cache');
+              if (cached) {
+                userProgramState = JSON.parse(cached);
+                renderJournalProgressUI();
+              }
+            } catch (e) {}
+          }
+        }
+
+        function renderJournalProgressUI() {
+          const { scans, currentDay, todayMission, completedHabits, has30DayPlan, isOwner, isPro } = userProgramState;
+
+          // 1. Quick Stats
+          const statTotal = document.getElementById('journalStatTotal');
+          const statCurrent = document.getElementById('journalStatCurrent');
+          const statDelta = document.getElementById('journalStatDelta');
+
+          if (statTotal) statTotal.textContent = String(scans.length);
+
+          if (scans.length > 0) {
+            const latestScan = scans[scans.length - 1];
+            const baselineScan = scans[0];
+            const delta = latestScan.score - baselineScan.score;
+            const deltaSign = delta >= 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1);
+
+            if (statCurrent) statCurrent.textContent = `${latestScan.score.toFixed(1)} ± 0.1`;
+            if (statDelta) {
+              statDelta.textContent = `${deltaSign} PSL`;
+              statDelta.className = delta >= 0
+                ? 'font-mono font-bold text-xs text-emerald-600 dark:text-emerald-400'
+                : 'font-mono font-bold text-xs text-amber-600 dark:text-amber-400';
+            }
+          } else {
+            if (statCurrent) statCurrent.textContent = '--';
+            if (statDelta) statDelta.textContent = '+0.0 PSL';
+          }
+
+          // 2. 30-Day Program UI
+          const badgePlanDay = document.getElementById('badgePlanDay');
+          const txtPlanMissionTitle = document.getElementById('txtPlanMissionTitle');
+          const txtPlanMissionBody = document.getElementById('txtPlanMissionBody');
+          const txtPlanProgressPct = document.getElementById('txtPlanProgressPct');
+          const chkHabitDoneToday = document.getElementById('chkHabitDoneToday');
+          const bannerControlScan = document.getElementById('bannerControlScanReminder');
+          const boxUnlockPromo = document.getElementById('boxUnlockPlanPromo');
+
+          const userHasAccess = has30DayPlan || isOwner || isPro;
+          if (boxUnlockPromo) {
+            if (userHasAccess) {
+              boxUnlockPromo.classList.add('hidden');
+            } else {
+              boxUnlockPromo.classList.remove('hidden');
+            }
+          }
+
+          if (badgePlanDay) badgePlanDay.textContent = `ДЕНЬ ${currentDay} ИЗ 30`;
+          if (todayMission) {
+            if (txtPlanMissionTitle) txtPlanMissionTitle.textContent = todayMission.title;
+            if (txtPlanMissionBody) txtPlanMissionBody.textContent = todayMission.morning;
+            if (bannerControlScan) {
+              if (todayMission.isControlScan) bannerControlScan.classList.remove('hidden');
+              else bannerControlScan.classList.add('hidden');
+            }
+          }
+
+          const doneDaysCount = Object.values(completedHabits).filter(Boolean).length;
+          const pct = Math.round((doneDaysCount / 30) * 100);
+          if (txtPlanProgressPct) txtPlanProgressPct.textContent = `${pct}% выполнено (${doneDaysCount}/30)`;
+
+          if (chkHabitDoneToday) {
+            chkHabitDoneToday.checked = !!completedHabits[currentDay];
+          }
+
+          // 3. Before / After Split-Slider
+          renderSplitSliderImages(scans);
+
+          // 4. Trend Chart (Chart.js) with ±0.1 Confidence Band
+          renderProgressTrendChart(scans);
+
+          // 5. Saved Scans List
+          renderSavedScansList(scans);
+        }
+
+        function renderSplitSliderImages(scans) {
+          const splitImgBefore = document.getElementById('splitImgBefore');
+          const splitImgAfter = document.getElementById('splitImgAfter');
+          const splitPlaceholder = document.getElementById('splitPlaceholder');
+
+          if (scans.length >= 2) {
+            if (splitPlaceholder) splitPlaceholder.classList.add('hidden');
+            const day1 = scans[0];
+            const latest = scans[scans.length - 1];
+            if (splitImgBefore && day1.photoThumbnail) splitImgBefore.src = day1.photoThumbnail;
+            if (splitImgAfter && latest.photoThumbnail) splitImgAfter.src = latest.photoThumbnail;
+          } else if (scans.length === 1) {
+            if (splitPlaceholder) {
+              splitPlaceholder.classList.remove('hidden');
+              splitPlaceholder.innerHTML =
+                `<span class="text-3xl mb-1">📸</span>` +
+                `<p class="text-xs text-white font-semibold">Базовый скан (День 1) успешно зафиксирован!</p>` +
+                `<p class="text-[11px] text-[#8E9EB5] mt-1">Сделайте следующий контрольный замер на 5-й день для активации сплит-слайдера.</p>`;
+            }
+            if (splitImgBefore && scans[0].photoThumbnail) splitImgBefore.src = scans[0].photoThumbnail;
+          } else {
+            if (splitPlaceholder) {
+              splitPlaceholder.classList.remove('hidden');
+              splitPlaceholder.innerHTML =
+                `<span class="text-3xl mb-1">📸</span>` +
+                `<p class="text-xs text-white font-semibold">Сделайте замер лица для запуска сплит-слайдера До/После</p>` +
+                `<p class="text-[11px] text-[#8E9EB5] mt-1">Фотографии автоматически сжимаются до 960px для плавной работы на смартфоне.</p>`;
+            }
+          }
+        }
+
+        function renderProgressTrendChart(scans) {
+          const canvas = document.getElementById('journalChartCanvas');
+          if (!canvas) return;
+
+          if (progressChartInstance) {
+            progressChartInstance.destroy();
+            progressChartInstance = null;
+          }
+
+          const isDark = document.documentElement.classList.contains('dark');
+          const textColor = isDark ? '#E6EDF7' : '#0F172A';
+          const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+
+          if (scans.length === 0) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '12px Plus Jakarta Sans';
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+            ctx.fillText('Сделайте первый замер для построения кривой прогресса', canvas.width / 2, canvas.height / 2);
+            return;
+          }
+
+          const labels = scans.map((s, idx) => {
+            const d = new Date(s.date);
+            return `${d.getDate()}.${d.getMonth() + 1}`;
+          });
+
+          const scores = scans.map(s => s.score);
+          const upperBounds = scores.map(s => +(s + 0.1).toFixed(2));
+          const lowerBounds = scores.map(s => +(s - 0.1).toFixed(2));
+
+          progressChartInstance = new Chart(canvas, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: 'Балл PSL (±0.1)',
+                  data: scores,
+                  borderColor: '#2563EB',
+                  backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                  borderWidth: 2.5,
+                  pointRadius: 4,
+                  pointBackgroundColor: '#2563EB',
+                  pointBorderColor: '#ffffff',
+                  pointBorderWidth: 1.5,
+                  tension: 0.25,
+                  fill: false
+                },
+                {
+                  label: '+0.1 Погрешность',
+                  data: upperBounds,
+                  borderColor: 'rgba(37, 99, 235, 0.25)',
+                  borderDash: [3, 3],
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: false
+                },
+                {
+                  label: '-0.1 Погрешность',
+                  data: lowerBounds,
+                  borderColor: 'rgba(37, 99, 235, 0.25)',
+                  borderDash: [3, 3],
+                  borderWidth: 1,
+                  pointRadius: 0,
+                  fill: false
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  min: Math.max(0, Math.min(...lowerBounds) - 0.4),
+                  max: Math.min(10, Math.max(...upperBounds) + 0.4),
+                  grid: { color: gridColor },
+                  ticks: {
+                    color: textColor,
+                    font: { family: 'JetBrains Mono', size: 10 },
+                    callback: (val) => `${val} PSL`
+                  }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 10 } }
+                }
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      const val = context.parsed.y;
+                      return `Балл: ${val.toFixed(1)} ± 0.1 PSL`;
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        function renderSavedScansList(scans) {
+          const list = document.getElementById('journalScansList');
+          if (!list) return;
+
+          if (scans.length === 0) {
+            list.innerHTML = '<p class="text-xs text-center text-[#52627A] dark:text-[#8E9EB5] py-4">Журнал пуст. Сделайте замер и нажмите «Сохранить скан».</p>';
+            return;
+          }
+
+          list.innerHTML = '';
+          const reversed = [...scans].reverse();
+          const baselineScore = scans[0].score;
+
+          reversed.forEach((scan, revIdx) => {
+            const actualIdx = scans.length - 1 - revIdx;
+            const isBase = actualIdx === 0;
+            const diff = scan.score - baselineScore;
+            const diffText = isBase ? 'База' : (diff >= 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1));
+            const diffColor = isBase
+              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+              : (diff >= 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400');
+
+            const dateStr = new Date(scan.date).toLocaleString('ru-RU', {
+              day: 'numeric',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+
+            const card = document.createElement('div');
+            card.className = 'flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-[#172033] border border-[#D1DEEE] dark:border-[#202C45] hover:border-blue-400 transition-all';
+            card.innerHTML = `
+              <div class="flex items-center gap-3 min-w-0">
+                ${scan.photoThumbnail ? `<img src="${scan.photoThumbnail}" class="w-10 h-10 rounded-lg object-cover border border-[#D1DEEE] dark:border-[#202C45] shrink-0" alt="Scan" />` : `<div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center font-bold text-blue-600 shrink-0">#${actualIdx + 1}</div>`}
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-xs text-[#0F172A] dark:text-[#E6EDF7]">Замер #${actualIdx + 1}</span>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${diffColor}">${diffText}</span>
+                  </div>
+                  <div class="text-[10px] text-[#52627A] dark:text-[#8E9EB5] truncate">${dateStr} • ${scan.modelName || 'Western PSL'}</div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-mono font-extrabold text-sm text-[#2563EB]">${scan.score.toFixed(1)}</span>
+                <span class="text-[10px] font-mono text-[#52627A] dark:text-[#8E9EB5] block">±0.1 PSL</span>
+              </div>
+            `;
+            list.appendChild(card);
+          });
+        }
+
+        function openHistoryJournalModal() {
+          const modal = document.getElementById('modalHistoryJournal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            syncProgramWithServer();
+          }
+        }
+
+        // --- SPLIT SLIDER TOUCH & MOUSE HANDLERS (60 FPS MOBILE) ---
+        const splitContainer = document.getElementById('splitSliderContainer');
+        let isDraggingSplit = false;
+
+        function updateSplitSliderPosition(clientX) {
+          if (!splitContainer) return;
+          const rect = splitContainer.getBoundingClientRect();
+          if (rect.width <= 0) return;
+          const rawPct = ((clientX - rect.left) / rect.width) * 100;
+          const clamped = Math.max(5, Math.min(95, rawPct));
+          const clipRight = document.getElementById('splitClipRight');
+          const handleLine = document.getElementById('splitHandleLine');
+          if (clipRight) clipRight.style.left = `${clamped}%`;
+          if (handleLine) handleLine.style.left = `${clamped}%`;
+        }
+
+        if (splitContainer) {
+          splitContainer.addEventListener('pointerdown', (e) => {
+            isDraggingSplit = true;
+            splitContainer.setPointerCapture(e.pointerId);
+            updateSplitSliderPosition(e.clientX);
+          });
+          splitContainer.addEventListener('pointermove', (e) => {
+            if (isDraggingSplit) {
+              updateSplitSliderPosition(e.clientX);
+            }
+          });
+          splitContainer.addEventListener('pointerup', (e) => {
+            isDraggingSplit = false;
+            try { splitContainer.releasePointerCapture(e.pointerId); } catch (err) {}
+          });
+          splitContainer.addEventListener('pointercancel', () => {
+            isDraggingSplit = false;
+          });
+        }
+
+        // --- SAVE SCAN TO PROGRESS BUTTON ---
+        const btnSaveCurrentScanToProgress = document.getElementById('btnSaveCurrentScanToProgress');
+        if (btnSaveCurrentScanToProgress) {
+          btnSaveCurrentScanToProgress.addEventListener('click', async () => {
+            if (!latestAnalysis) {
+              statusNotificationText.textContent = '⚠️ Сделайте сначала замер лица!';
+              return;
+            }
+
+            const tg = window.Telegram?.WebApp;
+            const tgUser = tg?.initDataUnsafe?.user;
+            const urlParams = new URLSearchParams(window.location.search);
+            const effectiveUsername = (tgUser?.username || urlParams.get('user') || '').toLowerCase().replace('@', '');
+            const userId = tgUser?.id || (effectiveUsername === 'wow_ogogo' ? 999999 : 0);
+
+            btnSaveCurrentScanToProgress.disabled = true;
+            btnSaveCurrentScanToProgress.textContent = '⏳ Сохранение...';
+
+            try {
+              const basePhoto = latestAnalyzedPhotoCanvas || getCompositeSnapshotCanvas();
+              const photoThumbnail = compressCanvasToThumbnail(basePhoto, 960, 0.80);
+
+              const scanData = {
+                id: `scan_${Date.now()}`,
+                date: new Date().toISOString(),
+                score: latestAnalysis.finalScore,
+                scoreMargin: 0.1,
+                fwhr: latestAnalysis.metrics.fwhr?.val,
+                midface: latestAnalysis.metrics.midface?.val,
+                canthalTilt: latestAnalysis.metrics.canthal?.val,
+                symmetry: latestAnalysis.metrics.symmetry?.val,
+                jawAngle: latestAnalysis.metrics.jawAngle?.val,
+                photoThumbnail,
+                modelName: currentAestheticModel === 'asian' ? 'East Asian K-Line' : 'Western PSL',
+                verdict: latestAnalysis.tierKey
+              };
+
+              const res = await fetch(getApiUrl('/api/telegram/save-scan'), {
+                method: 'POST',
+                headers: getTelegramHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ userId, username: effectiveUsername, scan: scanData })
+              });
+
+              const data = await res.json();
+              if (data && data.ok) {
+                userProgramState.scans.push(data.scan);
+                renderJournalProgressUI();
+
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                  window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+                btnSaveCurrentScanToProgress.textContent = '✅ Сохранено!';
+                setTimeout(() => {
+                  btnSaveCurrentScanToProgress.disabled = false;
+                  btnSaveCurrentScanToProgress.textContent = '💾 Сохранить скан';
+                }, 2000);
+              } else {
+                throw new Error(data.error || 'Ошибка сохранения');
+              }
+            } catch (err) {
+              console.error('Error saving scan to progress:', err);
+              btnSaveCurrentScanToProgress.disabled = false;
+              btnSaveCurrentScanToProgress.textContent = '💾 Сохранить скан';
+            }
+          });
+        }
+
+        // --- TOGGLE HABIT FOR TODAY ---
+        const chkHabitDoneToday = document.getElementById('chkHabitDoneToday');
+        if (chkHabitDoneToday) {
+          chkHabitDoneToday.addEventListener('change', async (e) => {
+            const completed = e.target.checked;
+            const tg = window.Telegram?.WebApp;
+            const tgUser = tg?.initDataUnsafe?.user;
+            const urlParams = new URLSearchParams(window.location.search);
+            const effectiveUsername = (tgUser?.username || urlParams.get('user') || '').toLowerCase().replace('@', '');
+            const userId = tgUser?.id || (effectiveUsername === 'wow_ogogo' ? 999999 : 0);
+            const currentDay = userProgramState.currentDay || 1;
+
+            userProgramState.completedHabits[currentDay] = completed;
+            renderJournalProgressUI();
+
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+              window.Telegram.WebApp.HapticFeedback.impactOccurred(completed ? 'medium' : 'light');
+            }
+
+            try {
+              await fetch(getApiUrl('/api/telegram/toggle-habit'), {
+                method: 'POST',
+                headers: getTelegramHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ userId, username: effectiveUsername, day: currentDay, completed })
+              });
+            } catch (err) {
+              console.warn('Error saving habit toggle:', err);
+            }
+          });
+        }
+
+        // --- MODAL CONTROLS & UNLOCK PROMO ---
+        const btnOpenJournal = document.getElementById('btnOpenJournal');
+        const btnCloseJournalModal = document.getElementById('btnCloseJournalModal');
+        const modalHistoryJournal = document.getElementById('modalHistoryJournal');
+        const btnClearJournal = document.getElementById('btnClearJournal');
+        const btnUnlockPlanNow = document.getElementById('btnUnlockPlanNow');
+
+        if (btnOpenJournal) {
+          btnOpenJournal.addEventListener('click', openHistoryJournalModal);
+        }
+        if (btnCloseJournalModal && modalHistoryJournal) {
+          btnCloseJournalModal.addEventListener('click', () => modalHistoryJournal.classList.add('hidden'));
+        }
+        if (modalHistoryJournal) {
+          modalHistoryJournal.addEventListener('click', (e) => {
+            if (e.target === modalHistoryJournal) modalHistoryJournal.classList.add('hidden');
+          });
+        }
+        if (btnUnlockPlanNow) {
+          btnUnlockPlanNow.addEventListener('click', () => {
+            if (modalHistoryJournal) modalHistoryJournal.classList.add('hidden');
+            updateStarsProductSelection('transformation_30d');
+            const paywall = document.getElementById('modalPaywall');
+            if (paywall) paywall.classList.remove('hidden');
+          });
+        }
+        if (btnClearJournal) {
+          btnClearJournal.addEventListener('click', () => {
+            if (confirm('Очистить локальный кэш истории замеров?')) {
+              userProgramState.scans = [];
+              try { localStorage.removeItem('psl_user_program_cache'); } catch (e) {}
+              renderJournalProgressUI();
+            }
           });
         }
 

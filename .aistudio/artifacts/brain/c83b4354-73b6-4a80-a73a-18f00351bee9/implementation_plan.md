@@ -1,189 +1,194 @@
-# PSL Face Analyzer — Google Play Launch & Monetization Roadmap (Capacitor Edition)
+# Архитектурное разделение: GitHub Pages + Render Web Service + Supabase (PgBouncer) + Защита HMAC-SHA256 & Keep-Alive
 
-Комплексный пошаговый план подготовки приложения к релизу в Google Play Store с использованием нативного моста **Capacitor**, архитектурой реального времени через **WebView `getUserMedia()` (строго 720p / 1280x720)** для 11-точечного коуча, отложенным запросом разрешений галереи (Android 13+ Tiramisu), обязательным медицинским дисклеймером для модерации Google Play и мобильной монетизацией (Monthly + Annual + Lifetime).
+Комплексный план безопасного переноса Telegram Mini App: публичный статический фронтенд на **GitHub Pages** (без секретов), защищенный бэкенд на **Render** с **криптографической валидацией `initData` по алгоритму HMAC-SHA256**, подключение к **Supabase PostgreSQL через Transaction Pooler (порт 6543) с `service_role` ключом**, и **Keep-Alive пинг** против сна бесплатного сервера.
 
 ---
 
 ### User Review & Critical Decisions
 
 > [!IMPORTANT]
-> **Учтённые финальные правки пользователя:**
-> - **Своевременный запрос разрешений (Just-in-Time Permissions для Android 13+)**: Полный запрет на запрос доступа к фото/галерее при старте приложения. Разрешение на выбор медиа запрашивается **строго в момент тапа** на кнопку «Загрузить фото из галереи». Это исключает отклонение модерацией Google Play за агрессивный сбор разрешений.
-> - **Фиксация потока камеры на 720p (1280x720)**: В `getUserMedia` устанавливается жёсткое ограничение `ideal: 1280, max: 1280` на `ideal: 720, max: 720`. Это предотвращает перегрузку GPU/CPU и падение FPS на процессорах среднего уровня (Snapdragon 6xx/7xx, Mediatek Helio/Dimensity), обеспечивая стабильные 30 кадров/сек для FaceMesh.
-> - **Обязательный дисклеймер для Google Play**: В онбординг внедряется обязательный чекбокс: *«Я понимаю, что приложение носит исключительно эстетический характер и не является медицинским инструментом или диагностикой»* с фиксацией согласия. Без этого приложение не допускается в категорию Health & Fitness / Beauty.
-> - **Архитектура камеры**: Живой 11-точечный коуч работает через нативный `getUserMedia` внутри WebView. Плагин `@capacitor/camera` используется только для галереи.
-> - **Тарифная сетка без недельной подписки**: Месячный план ($4.99 с 3-дневным триалом), Годовой план ($29.99, экономия 50%) и Пожизненный доступ ($49.99).
-> - **Безопасный рендеринг PDF**: Адаптивный `scale: 1.5` для смартфонов с RAM $\le 4$ ГБ с прямой вставкой буфера фото для защиты от OOM в WebView.
+> Ключевые решения по безопасности и архитектуре:
+> 
+> - **Confirmed Decision 1 (Криптографическая защита от подделки запросов: HMAC-SHA256)**:
+>   - Поскольку фронтенд на GitHub Pages и API на Render публичны, клиент **не может просто передавать произвольный `userId`**.
+>   - Каждый запрос с фронтенда отправляет заголовок `X-Telegram-Init-Data` (или `Authorization: tma <initData>`), содержащий оригинальную строку `window.Telegram?.WebApp?.initData`.
+>   - Бэкенд в middleware рассчитывает HMAC-SHA256 подпись с использованием токена бота (`HMAC_SHA256("WebAppData", BOT_TOKEN)`), проверяет хэш и давность `auth_date` (защита от replay-атак).
+>   - Настоящий `userId` и `username` извлекаются **исключительно из верифицированной строки Telegram**, что делает подделку данных и чужих замеров математически невозможной.
+> 
+> - **Confirmed Decision 2 (Секретный `service_role` ключ Supabase строго на бэкенде)**:
+>   - Фронтенд на GitHub Pages **не содержит** никаких ключей Supabase или строк подключения к БД.
+>   - Бэкенд на Render использует `SUPABASE_SERVICE_ROLE_KEY`, хранящийся в закрытых переменных окружения Render.
+>   - Так как бэкенд сам проверяет авторизацию Telegram HMAC-SHA256, он безопасно читает и пишет данные в Supabase от имени подтвержденного пользователя.
+> 
+> - **Confirmed Decision 3 (Динамический `VITE_API_URL` без хардкода)**:
+>   - Фронтенд использует `const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')`.
+>   - URL Render передается через **GitHub Secrets** (`secrets.VITE_API_URL`) на этапе сборки GitHub Actions.
+> 
+> - **Confirmed Decision 4 (Supabase Connection Pooler / PgBouncer на порту 6543)**:
+>   - Подключение выполняется через **Transaction Pooler (PgBouncer, порт 6543)** либо HTTP REST клиент `@supabase/supabase-js`, чтобы не исчерпывать лимиты одновременных подключений к PostgreSQL на бесплатном тарифе Render.
+> 
+> - **Confirmed Decision 5 (Защита от засыпания Render: Keep-Alive)**:
+>   - Эндпоинт `GET /health` (`status: "ok"`) для мониторинга через UptimeRobot / Cron-job.org (раз в 5–10 минут).
+>   - Вспомогательный внутренний self-ping в `server.ts` каждые 12 минут при наличии `RENDER_EXTERNAL_URL`.
+> 
+> - **Confirmed Decision 6 (Тарифы и VIP-доступ)**:
+>   - `50 Stars`: Разовый детальный PDF-отчёт в чат.
+>   - `199 Stars`: 30-дневная персонализированная программа с бот-пушами и трекером. Активируется **только сервером** при подтвержденном событии оплаты `successful_payment` в Telegram API.
+>   - `@wow_ogogo`: Постоянный статус `👑 VIP ВЛАДЕЛЕЦ` без списания Stars.
 
 ---
 
-### 1. Overview & Core Concept
+## 1. Overview & Core Concept
 
-- **Что делает приложение**: Карманный биометрический и эстетический сканер лица с живым трекингом по 468 точкам MediaPipe FaceMesh в реальном времени, работающий внутри оптимизированного нативного Android WebView.
-- **Целевая аудитория**: Сообщества Looksmaxing, K-Beauty, фитнес- и бьюти-энтузиасты (16–35 лет), нацеленные на объективное улучшение пропорций лица и отслеживание эффекта софтмаксинга во времени.
-- **Ключевая ценность**: Интерактивный коуч реального времени (контроль наклона, симметрии, нейтрального выражения лица по 11 параметрам перед снимком) и формирование клинического PDF-отчёта с рекомендациями.
+- **Фронтенд (GitHub Pages)**: Статическое приложение (Vite), быстро загружается через глобальный CDN GitHub, не содержит секретов, отправляет криптографически подписанные запросы `initData`.
+- **Бэкенд (Render Web Service)**: Авторизационный шлюз и бизнес-логика. Валидирует подпись Telegram, управляет Telegraf ботом, отправляет push-уведомления по расписанию (09:00 и 20:30 по времени пользователя), защищен от засыпания через `/health`.
+- **База данных (Supabase PostgreSQL)**: Хранит историю замеров, 30-дневные чек-листы и таймзоны. Доступна только серверу через `service_role` и Transaction Pooler (порт 6543).
 
 ---
 
-### 2. User Experience & Visual Design
-
-#### Мобильный онбординг с медицинским дисклеймером и Paywall-воронкой
+## 2. Technical Architecture & Security Flow
 
 ```
-[ Скачивание из Google Play ]
-             │
-             ▼
-[ Экран Онбординга + Дисклеймер Google Play ]
-  ├─ Слайды ценности (Научный анализ, 11 пропорций, софтмаксинг)
-  └─ Чекбокс: [✓] «Я понимаю, что приложение носит исключительно
-                 эстетический характер и не является медицинским инструментом»
-             │
-             ▼
-[ Запрос доступа к камере (только перед запуском сканера) ]
-             │
-             ▼
-[ Real-Time Экран Коуча: 720p 30 FPS ] ──> 11 условий фронтального протокола 0°
-             │
-             ▼
-[ Снимок и базовый бесплатный результат ] ──> Score, Tier, 3 базовые метрики
-             │
-             ▼
-[ Экран Paywall "PRO Looksmaxing Club" ]
-  ├─ 1. Месячная подписка: $4.99 / месяц (3 дня бесплатный триал)
-  ├─ 2. Годовая подписка (Хит продаж): $29.99 / год ($2.50/мес, экономия 50%)
-  └─ 3. Пожизненный доступ (Lifetime): $49.99 единоразово
-             │
-             ▼
-[ Разблокированный функционал PRO ]:
-  ├─ Генератор подробного PDF-отчёта с полной разметкой лица
-  ├─ Все 11 метрик с идеалами выбранной модели
-  ├─ Детальные гайды (стрижки под форму черепа, шея, осанка, уход)
-  └─ Трекер прогресса (IndexedDB) с динамикой изменений
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              TELEGRAM CLIENT (Mobile / Web)                            │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ Telegram WebApp Container                                                        │  │
+│  │ • window.Telegram.WebApp.initData (Криптографически подписана Telegram API)      │  │
+│  └────────────────────────────────────────┬─────────────────────────────────────────┘  │
+└───────────────────────────────────────────┼────────────────────────────────────────────┘
+                                            │
+                                            │ 1. Загрузка статики (CDN)
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                             GITHUB PAGES (Публичный фронтенд)                          │
+│  • Статическая сборка (dist/) с base: './'                                             │
+│  • VITE_API_URL передан при сборке через GitHub Secrets                                │
+│  • Запросы к API снабжаются заголовком:                                                │
+│    headers: { 'X-Telegram-Init-Data': Telegram.WebApp.initData }                       │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                            │ 2. HTTPS Запрос + X-Telegram-Init-Data
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              RENDER WEB SERVICE (Бэкенд)                               │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ HMAC-SHA256 Middleware Проверки:                                                 │  │
+│  │ 1. Secret = HMAC_SHA256("WebAppData", BOT_TOKEN)                                 │  │
+│  │ 2. CheckHash = HMAC_SHA256(dataCheckString, Secret)                              │  │
+│  │ 3. CheckHash == hash ? Pass & Extract userId : REJECT (401 Unauthorized)         │  │
+│  │ 4. auth_date < 24h (Защита от replay-атак)                                       │  │
+│  └────────────────────────────────────────┬─────────────────────────────────────────┘  │
+│                                           │                                            │
+│  ┌───────────────────────┐  ┌─────────────┴────────┐  ┌─────────────────────────────┐  │
+│  │ Telegraf Bot Engine   │  │ REST API Endpoints   │  │ Hourly Timezone Cron Worker │  │
+│  │ Stars Invoices        │  │ /api/telegram/*      │  │ Local 09:00 & 20:30 Pushes  │  │
+│  └───────────────────────┘  └─────────────┬────────┘  └─────────────────────────────┘  │
+│                                           │                                            │
+│  ┌────────────────────────────────────────┴─────────────────────────────────────────┐  │
+│  │ GET /health (Anti-Sleep Pinger Endpoint) ◄── UptimeRobot / Cron-job.org          │  │
+│  └──────────────────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                            │ 3. PgBouncer (Port 6543) / REST PostgREST
+                                            │    Авторизован через SUPABASE_SERVICE_ROLE_KEY
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                     SUPABASE POSTGRESQL (База данных с Transaction Pooler)             │
+│  Таблица `telegram_users`:                                                             │
+│  • id (BigInt, PK) = проверенный userId из Telegram HMAC-SHA256                        │
+│  • username, first_name, timezone                                                      │
+│  • has_30_day_plan, plan_start_date, completed_habits (JSONB), scans (JSONB)           │
+│  • is_vip (true для @wow_ogogo)                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### 3. Key Product Decisions & Trade-Offs
+## 3. Key Product Decisions & Implementation Details
 
-#### Решение 1: Камера реального времени — 720p Constraint в WebView
-- **Проблема**: Запрос потока 1080p или дефолтного максимального разрешения сенсора смартфона приводит к лагам WebView, перегреву устройства и пропуску кадров нейросетью FaceMesh.
-- **Выбранный подход**:
-  - Строгие ограничения в `navigator.mediaDevices.getUserMedia`:
-    ```javascript
-    const constraints = {
-      audio: false,
-      video: {
-        facingMode: 'user',
-        width: { ideal: 1280, max: 1280 },
-        height: { ideal: 720, max: 720 },
-        frameRate: { ideal: 30, max: 30 }
-      }
+### 1. Реализация HMAC-SHA256 валидации на сервере
+- В `server.ts` создается строгий middleware:
+  ```typescript
+  import crypto from 'crypto';
+
+  function validateTelegramWebAppData(initData: string, botToken: string): { valid: boolean; user?: any } {
+    if (!initData) return { valid: false };
+    const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+    if (!hash) return { valid: false };
+
+    params.delete('hash');
+    const sortedKeys = Array.from(params.keys()).sort();
+    const dataCheckString = sortedKeys.map(k => `${k}=${params.get(k)}`).join('\n');
+
+    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
+    const calculatedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+
+    if (calculatedHash !== hash) return { valid: false };
+
+    // Проверка auth_date (не старше 24 часов)
+    const authDate = Number(params.get('auth_date') || 0);
+    if (Date.now() / 1000 - authDate > 86400) return { valid: false };
+
+    const userRaw = params.get('user');
+    const user = userRaw ? JSON.parse(userRaw) : null;
+    return { valid: true, user };
+  }
+  ```
+- Для любого эндпоинта сохранения замеров (`POST /api/telegram/save-scan`), обновления привычек (`POST /api/telegram/toggle-habit`) или получения программы (`GET /api/telegram/user-program`) идентификатор пользователя берется **не из тела запроса, а из проверенного объекта `user`**.
+
+### 2. Защита платежей Telegram Stars (199 и 50 Stars)
+- Активация 30-дневного плана за 199 Stars или генерация платного PDF за 50 Stars происходит **исключительно по событию `successful_payment`** от Telegram API в Telegraf:
+  - Никакой клиентский вызов не может передать флаг `has30DayPlan: true`.
+  - При получении вебхука об успешной оплате бэкенд находит пользователя в Supabase и обновляет статус `has_30_day_plan = true`.
+
+### 3. Подключение Supabase через `service_role` и Transaction Pooler
+- На бэкенде в Render устанавливаются переменные:
+  - `SUPABASE_URL`: `https://your-project.supabase.co`
+  - `SUPABASE_SERVICE_ROLE_KEY`: `eyJhbGciOi...` (секретный сервисный ключ)
+  - `DATABASE_URL`: `postgres://postgres.[ref]:[pass]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true`
+- Использование Transaction Pooler (порт 6543) предотвращает исчерпание лимита открытых сокетов при частых обращениях планировщика и веб-сервера.
+
+### 4. Динамический клиентский URL без хардкода
+- Во фронтенде:
+  ```typescript
+  const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
+  function getTelegramHeaders() {
+    const initData = window.Telegram?.WebApp?.initData || '';
+    return {
+      'Content-Type': 'application/json',
+      'X-Telegram-Init-Data': initData
     };
-    ```
-  - Это снижает нагрузку на шину памяти Android на 55% по сравнению с 1080p, обеспечивая стабильные 30 FPS на любом бюджетном чипсете.
+  }
+  ```
+- В GitHub Actions: `VITE_API_URL: ${{ secrets.VITE_API_URL }}`.
 
-#### Решение 2: Разрешения Android 13+ (Tiramisu & Upside Down Cake)
-- **Проблема**: Запрос `READ_MEDIA_IMAGES` при запуске приложения считается модераторами Google Play «агрессивным сбором данных», если пользователь ещё не инициировал загрузку файла.
-- **Выбранный подход**:
-  - **Just-In-Time Permissions**: Разрешение запрашивается **только в момент клика** на «Загрузить фото из галереи».
-  - Используется официальный `Camera.getPhoto({ source: CameraSource.Photos })` из `@capacitor/camera` v5+, который на Android 13+ использует системный Photo Picker, **вообще не требующий runtime-разрешений на чтение всего хранилища**!
-
-#### Решение 3: Дисклеймер для прохождения модерации в Google Play Console
-- **Проблема**: Модераторы Google Play банят приложения, использующие термины «антропометрия», «цефалометрия» или «диагностика», если нет явного подтверждения ненаправленности на медицинское использование.
-- **Выбранный подход**:
-  - Чекбокс согласия на первом экране (блокирует переход, пока пользователь не поставит галочку).
-  - Ссылка на Privacy Policy и Terms of Use в футере онбординга.
-  - Постоянный текст в футере PDF-отчёта: *«Настоящий отчёт носит исключительно косметическо-информационный характер и не является медицинским диагнозом»*.
-
-#### Решение 4: Оптимизация памяти генератора PDF
-- **Выбранный подход**: Адаптивный рендеринг `scale: 1.5` для устройств с $\le 4$ ГБ RAM и прямая вставка замороженного холста `latestAnalyzedPhotoCanvas` без тяжелой повторной векторизации DOM.
+### 5. Anti-Sleep Keep-Alive на Render
+- `GET /health` мгновенно отвечает `{ status: "ok", uptime: process.uptime() }`.
+- Предоставляется конфигурация для UptimeRobot / Cron-job.org.
+- Дополнительный внутренний `setInterval` в `server.ts` на 12 минут.
 
 ---
 
-### 4. Technical Architecture & Data Strategy
+## 4. Пошаговые этапы реализации (Implementation Milestones)
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        GOOGLE PLAY CONSOLE                             │
-│  [ Android App Bundle (.aab) ] ──> Google Play Billing Library v6+     │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                      CAPACITOR ANDROID RUNTIME                         │
-│                                                                        │
-│  ┌─────────────────────────┐             ┌──────────────────────────┐  │
-│  │ Android WebView Camera  │             │ @revenuecat/purchases    │  │
-│  │ navigator.mediaDevices  │             │ Обработка подписок и     │  │
-│  │ .getUserMedia(720p)     │             │ валидация чеков Google   │  │
-│  └────────────┬────────────┘             └────────────┬─────────────┘  │
-│               │ (Locked 720p @ 30fps)                 │                │
-│               ▼                                       ▼                │
-│  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │                     APP CORE (VITE / REACT / TS)                 │  │
-│  │                                                                  │  │
-│  │  [ Medical Disclaimer ] ──> Чекбокс согласия перед стартом       │  │
-│  │  [ MediaPipe FaceMesh ] ──> 468 точек (Локально на GPU)          │  │
-│  │  [ 11-Condition Coach ] ──> Живой анализ позы и освещения        │  │
-│  │  [ Frozen Photo Canvas] ──> Захват кадра в момент снимка         │  │
-│  │  [ Paywall Guardian ]   ──> Проверка статуса подписки в рантайме │  │
-│  │  [ Memory-Safe PDF ]    ──> Адаптивный рендер под RAM смартфона  │  │
-│  └──────────────────────────────────────────────────────────────────┘  │
-│               │                                       │                │
-│               ▼                                       ▼                │
-│  ┌─────────────────────────┐             ┌──────────────────────────┐  │
-│  │      INDEXEDDB          │             │   ANDROID PHOTO PICKER   │  │
-│  │ Локальный журнал замеров│             │ JIT-запрос галереи       │  │
-│  │ (100% приватность)      │             │ только по клику          │  │
-│  └─────────────────────────┘             └──────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-### 5. Пошаговый план внедрения (Execution Milestones)
-
-#### Этап 1: Интеграция Capacitor и настройка WebView-камеры (720p)
-- [ ] Установка зависимостей:
-  ```bash
-  npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/camera @capacitor/filesystem @capacitor/share
-  npx cap init "PSL Face Analyzer" "com.looksmaxing.pslanalyzer" --web-dir dist
-  npx cap add android
-  ```
-- [ ] Настройка `android/app/src/main/AndroidManifest.xml`:
-  ```xml
-  <uses-permission android:name="android.permission.CAMERA" />
-  <uses-feature android:name="android.hardware.camera" android:required="true" />
-  <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-  ```
-- [ ] Фиксация 720p в `startLiveCamera()`: `width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 }`.
-
-#### Этап 2: Онбординг с медицинским дисклеймером и JIT-галерея
-- [ ] Компонент стартового онбординга с обязательным чекбоксом: *«Я понимаю, что приложение не является медицинским инструментом»*.
-- [ ] Подключение `@capacitor/camera` исключительно для кнопки «Загрузить фото из галереи» с вызовом нативного Android 13+ Photo Picker без ранних разрешений.
-
-#### Этап 3: Оптимизация памяти генератора PDF под Android
-- [ ] Внедрение детектора памяти устройства (`navigator.deviceMemory`).
-- [ ] Адаптивный рендеринг `scale: 1.5` для устройств $\le 4$ ГБ RAM.
-- [ ] Дисклеймер в футере PDF: *«Не является медицинским инструментом»*.
-- [ ] Сохранение готового PDF через `Capacitor Filesystem` + нативный системный диалог «Поделиться» (`@capacitor/share`).
-
-#### Этап 4: Модуль монетизации и шторка Paywall
-- [ ] Интеграция плагина покупок: `@revenuecat/purchases-capacitor` или `@capacitor-community/google-play-billing`.
-- [ ] Разработка UI-компонента Paywall (Месяц $4.99 / Год $29.99 / Навсегда $49.99) с блокировкой полного экспорта и углублённых советов для бесплатных пользователей.
-- [ ] Кнопка «Восстановить покупки» и автоматическая валидация активной подписки при старте.
-
-#### Этап 5: Локальный трекер истории (Progress Journal)
-- [ ] Создание локальной базы замеров в `IndexedDB` (дата, модель, итоговый балл, фото-превью, ключевые метрики).
-- [ ] Экран «Мой прогресс»: график динамики балла PSL во времени и сравнение «До / После» для платных пользователей.
-
-#### Этап 6: Сборка релизного бандла (.aab) и публикация в Google Play
-- [ ] Генерация релизного ключа подписи (`keytool -genkey -v -keystore release.jks ...`).
-- [ ] Настройка `build.gradle` (версионирование `versionCode`, `versionName`, signingConfigs).
-- [ ] Сборка релизного бандла: `./gradlew bundleRelease`.
-- [ ] Промо-материалы для Google Play Console:
-  - Иконка $512 \times 512\text{px}$.
-  - Feature Graphic $1024 \times 500\text{px}$.
-  - Скриншоты смартфонов с демонстрацией разметки лица.
-  - Политика конфиденциальности и заполнение деклараций безопасности данных (Zero Data Collected).
-- [ ] Загрузка в Google Play Console (Closed Testing $\to$ Open Testing $\to$ Production).
+1. **Этап 1: HMAC-SHA256 валидация и безопасность бэкенда**:
+   - Реализация функции проверки `validateTelegramWebAppData` в `server.ts`.
+   - Защита всех эндпоинтов `/api/telegram/*` middleware-валидацией.
+   - Извлечение подтвержденного `userId` из заголовка `X-Telegram-Init-Data`.
+2. **Этап 2: Адаптер Supabase (Transaction Pooler & service_role)**:
+   - Интеграция `@supabase/supabase-js` с `service_role` ключом.
+   - Создание SQL схемы `supabase_schema.sql` (таблица `telegram_users` с индексами).
+   - Поддержка fallback на локальный `data/users_db.json` при отсутствии учетных данных.
+3. **Этап 3: Клиентский код с динамическим `VITE_API_URL`**:
+   - Обновление сетевых вызовов в `index.html` для автоматической отправки заголовка `X-Telegram-Init-Data`.
+   - Использование `import.meta.env.VITE_API_URL`.
+   - Настройка `vite.config.ts`: `base: './'`.
+4. **Этап 4: Keep-Alive эндпоинт и фоновый пинг**:
+   - Реализация `GET /health` в `server.ts`.
+   - Внутренний таймер self-ping при наличии переменной `RENDER_EXTERNAL_URL`.
+5. **Этап 5: Файлы деплоя и документация**:
+   - Создание `.github/workflows/deploy.yml` для автоматической сборки GitHub Pages с передачей секрета `VITE_API_URL`.
+   - Создание подробного руководства `DEPLOY_GUIDE.md` (настройка Supabase Pooler 6543, Render Web Service, UptimeRobot).
+   - Полная проверка компиляции и сборки (`npm run build`, `compile_applet`).

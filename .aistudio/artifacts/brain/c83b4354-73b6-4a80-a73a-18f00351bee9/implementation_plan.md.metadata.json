@@ -1,6 +1,6 @@
 {
-  "summary": "Finalized implementation plan incorporating Android 13+ runtime on-demand permissions, strict 720p getUserMedia resolution constraints for steady 30fps on mid-range devices, and mandatory non-medical disclaimer checkbox for Google Play Health policy compliance.",
-  "updatedAt": "2026-10-19T20:18:59.076964420Z",
-  "requestFeedback": true,
-  "userFacing": true
+  "summary":  "Обновление плана с учетом строгой безопасности: криптографическая верификация Telegram.WebApp.initData через HMAC-SHA256 на бэкенде, извлечение userId исключительно из валидированной подписи Telegram для защиты от спуфинга, хранение Supabase service_role ключа строго на бэкенде Render без утечки на публичный фронтенд GitHub Pages.",
+  "updatedAt":  "2026-10-25T10:46:31.369363088Z",
+  "requestFeedback":  true,
+  "userFacing":  true
 }

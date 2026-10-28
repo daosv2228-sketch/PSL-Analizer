@@ -1,0 +1,39 @@
+[
+  {
+    "id": 999999,
+    "firstName": "Owner",
+    "username": "wow_ogogo",
+    "timeZone": "Europe/Moscow",
+    "isPro": true,
+    "has30DayPlan": true,
+    "planStartDate": "2026-10-23T20:13:36.550Z",
+    "starsBalance": 99999,
+    "purchases": [
+      {
+        "type": "lifetime_pro_owner",
+        "stars": 0,
+        "date": "2026-10-23T20:13:36.550Z"
+      }
+    ],
+    "scansCount": 1,
+    "referrals": 0,
+    "scans": [
+      {
+        "id": "scan_test_1",
+        "date": "2026-10-23T12:00:00.000Z",
+        "score": 7.4,
+        "scoreMargin": 0.1,
+        "fwhr": 1.98,
+        "midface": 1.02,
+        "canthalTilt": 4.5,
+        "symmetry": 0.985,
+        "jawAngle": 112,
+        "modelName": "Western PSL",
+        "verdict": "High-Tier"
+      }
+    ],
+    "completedHabits": {
+      "1": true
+    }
+  }
+]
